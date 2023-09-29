@@ -61,10 +61,14 @@ class ApplyUsernameAsMandatoryIfNeededEventListener extends AbstractControllerEv
             $conjunctionValidator = $eventValidator->getValidators()->current();
             /** @var GenericObjectValidator $genericEventValidator */
             $genericEventValidator = $conjunctionValidator->getValidators()->current();
-            $genericEventValidator->addPropertyValidator(
-                $this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName),
-                $notEmptyValidator
-            );
+
+
+            if(!empty($this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName))) {
+                $genericEventValidator->addPropertyValidator(
+                    $this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName),
+                    $notEmptyValidator
+                );
+            }
         }
     }
 
