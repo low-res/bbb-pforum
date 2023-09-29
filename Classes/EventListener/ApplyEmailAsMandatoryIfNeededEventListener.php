@@ -64,14 +64,17 @@ class ApplyEmailAsMandatoryIfNeededEventListener extends AbstractControllerEvent
             $conjunctionValidator = $eventValidator->getValidators()->current();
             /** @var GenericObjectValidator $genericEventValidator */
             $genericEventValidator = $conjunctionValidator->getValidators()->current();
-            $genericEventValidator->addPropertyValidator(
-                $this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName),
-                $notEmptyValidator
-            );
-            $genericEventValidator->addPropertyValidator(
-                $this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName),
-                $emailValidator
-            );
+
+            if(!empty($this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName))) {
+                $genericEventValidator->addPropertyValidator(
+                    $this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName),
+                    $notEmptyValidator
+                );
+                $genericEventValidator->addPropertyValidator(
+                    $this->getUsersPropertyName($controllerActionEvent->getRequest(), $argumentName),
+                    $emailValidator
+                );
+            }
         }
     }
 
