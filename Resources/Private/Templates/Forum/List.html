@@ -1,42 +1,46 @@
 <html lang="en"
-			xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-			data-namespace-typo3-fluid="true">
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
 
 <f:layout name="Default"/>
 
 <f:section name="main">
-	<f:flashMessages/>
+    <f:flashMessages/>
 
-	<h2>{f:translate(key: 'tx_pforum_domain_model_forum')}</h2>
+    <h1 class="mb-4">{f:translate(key: 'tx_pforum_domain_model_forum')}</h1>
 
-	<f:if condition="{forums -> f:count()}">
-		<f:then>
-			<div class="list-group list-group-flush">
-				<f:for each="{forums}" as="forum">
-					<div class="list-group-item p-0 py-1">
-						<div class="d-flex w-100 justify-content-between">
-							<h5 class="mb-1">
-								<f:link.action pageUid="{settings.pidOfDetailPage}"
-															 action="show"
-															 arguments="{forum: forum}">
-									{forum.title}
-								</f:link.action>
-							</h5>
-							<small>{forum.topics -> f:count()} {f:translate(key: 'tx_pforum_domain_model_forum.topics')}</small>
-						</div>
+    <f:if condition="{forums -> f:count()}">
+        <f:then>
+            <div class="list-group list-group-flush">
+                <f:for each="{forums}" as="forum">
 
-						<f:if condition="{forum.teaser}">
-							<p class="mb-1">{forum.teaser}</p>
-						</f:if>
-					</div>
-				</f:for>
-			</div>
-		</f:then>
-		<f:else>
-			<div class="alert alert-info" role="alert">
-				{f:translate(key: 'noResults')}
-			</div>
-		</f:else>
-	</f:if>
+                    <div class="list-group-item p-4 mb-1">
+                        <f:link.action pageUid="{settings.pidOfDetailPage}"
+                                       action="show"
+                                       arguments="{forum: forum}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+
+                                    {forum.title}
+
+                                </h5>
+                                <small>{forum.topics -> f:count()} {f:translate(key:
+                                    'tx_pforum_domain_model_forum.topics')}</small>
+                            </div>
+
+                            <f:if condition="{forum.teaser}">
+                                <p class="mb-1">{forum.teaser}</p>
+                            </f:if>
+                        </f:link.action>
+                    </div>
+                </f:for>
+            </div>
+        </f:then>
+        <f:else>
+            <div class="alert alert-info" role="alert">
+                {f:translate(key: 'noResults')}
+            </div>
+        </f:else>
+    </f:if>
 </f:section>
 </html>
