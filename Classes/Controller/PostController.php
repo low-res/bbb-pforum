@@ -201,11 +201,11 @@ class PostController extends AbstractController
         $email
             ->to(new Address($topic->getUser()->getEmail(), $topic->getUser()->getName()))
             ->from(new Address($this->extConf->getEmailFromAddress(), $this->extConf->getEmailFromName()))
-            ->subject('New post at your topic:' . $topic->getTitle())
+            ->subject('Neue Antwort auf Ihr Thema:' . $topic->getTitle())
             ->setTemplate('Default')
             ->assignMultiple([
                 'headline' => 'Hello ' . $topic->getUser()->getName(),
-                'introduction' => 'There is a new post for your topic ' . $topic->getTitle() . ' with following content:',
+                'introduction' => 'Es gibt eine neue Antwort auf Ihr Thema ' . $topic->getTitle() . ':',
                 'content' => nl2br($post->getDescription()),
             ]);
         GeneralUtility::makeInstance(Mailer::class)->send($email);
