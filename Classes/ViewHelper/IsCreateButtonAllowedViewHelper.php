@@ -61,8 +61,10 @@ class IsCreateButtonAllowedViewHelper extends AbstractViewHelper
             return false;
         }
 
-        $intersection = array_intersect($userGroupUids,$userAspect->getGroupIds());
-        return count($intersection) > 0;
+        return ture;
+        
+        //$intersection = array_intersect($userGroupUids,$userAspect->getGroupIds());
+        //return count($intersection) > 0;
         
         //return in_array($userGroupUid, $userAspect->getGroupIds(), true);
     }
