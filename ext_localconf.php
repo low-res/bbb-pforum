@@ -14,8 +14,9 @@ call_user_func(static function (): void {
         ],
         // non-cacheable actions
         [
-            \JWeiland\Pforum\Controller\TopicController::class => 'create, update, delete, activate',
-            \JWeiland\Pforum\Controller\PostController::class => 'create, update, delete, activate',
+            \JWeiland\Pforum\Controller\ForumController::class => 'list, show',
+            \JWeiland\Pforum\Controller\TopicController::class => 'show, new, create, edit, update, delete, activate',
+            \JWeiland\Pforum\Controller\PostController::class => 'new, create, edit, update, delete, activate',
         ]
     );
 
