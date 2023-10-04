@@ -48,9 +48,6 @@ class IsCreateButtonAllowedViewHelper extends AbstractViewHelper
             return false;
         }
 
-        // Following is a reduced version of f:security.isHasRole()
-        $userGroupUid = (int)$arguments['userGroupUid'];
-        $userGroupUids = explode(',',$arguments['userGroupUid']);
         
         $userAspect = self::getUserAspect();
         if ($userAspect === null) {
@@ -61,12 +58,7 @@ class IsCreateButtonAllowedViewHelper extends AbstractViewHelper
             return false;
         }
 
-        return ture;
-        
-        //$intersection = array_intersect($userGroupUids,$userAspect->getGroupIds());
-        //return count($intersection) > 0;
-        
-        //return in_array($userGroupUid, $userAspect->getGroupIds(), true);
+        return true;
     }
 
     protected static function getUserAspect(): ?UserAspect
