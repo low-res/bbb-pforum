@@ -57,6 +57,7 @@ class TopicController extends AbstractController
         $this->postProcessAndAssignFluidVariables([
             'topic' => $topic,
             'posts' => $posts,
+                                                  'is_own_topic' => $isOwnTopic
         ]);
     }
 
