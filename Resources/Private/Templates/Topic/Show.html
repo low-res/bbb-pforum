@@ -61,6 +61,11 @@
 					<f:if condition="{topic.description}">
 						<p class="card-text">{topic.description -> f:format.html(parseFuncTSPath: 'lib.parseFunc') -> f:format.nl2br()}</p>
 					</f:if>
+
+					<f:if condition="{is_own_topic}">
+						<f:link.action action="edit" arguments="{topic : topic}">Edit</f:link.action>
+						<f:link.action action="delete" arguments="{topic : topic}">Delete</f:link.action>
+					</f:if>
 				</div>
 			</div>
 		</div>
