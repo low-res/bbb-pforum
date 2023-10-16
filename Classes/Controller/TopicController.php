@@ -68,7 +68,6 @@ class TopicController extends AbstractController
         $this->postProcessAndAssignFluidVariables([
             'forum' => $forum,
             'topic' => GeneralUtility::makeInstance(Topic::class),
-            'is_own_topic' => $isOwnTopic
         ]);
     }
 
