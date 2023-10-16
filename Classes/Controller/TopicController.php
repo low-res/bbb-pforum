@@ -40,6 +40,13 @@ class TopicController extends AbstractController
     public function showAction(Topic $topic): void
     {
         $posts = $this->postRepository->findByTopic($topic);
+
+        $context = GeneralUtility::makeInstance(Context::class);
+        /** @var UserAspect $aspect */
+        $feuser = $context->getAspect('frontend.user');
+        $currentFeUserId = $feuser->get('id');
+        $isOwnTopic = $currentFeUserId == $topic->getFrontendUser()->getUid();
+        
         if ($this->frontendGroupHelper->uidExistsInGroupData((int)($this->settings['uidOfAdminGroup'] ?? 0))) {
             $posts->getQuery()
                 ->getQuerySettings()
@@ -60,6 +67,7 @@ class TopicController extends AbstractController
         $this->postProcessAndAssignFluidVariables([
             'forum' => $forum,
             'topic' => GeneralUtility::makeInstance(Topic::class),
+            'is_own_topic' => $isOwnTopic
         ]);
     }
 
