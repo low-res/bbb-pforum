@@ -1,4 +1,7 @@
 {
+	"repositories": [
+		{ "type": "git", 		"url": "https://bitbucket.org/paul_webyte/bbb_events" }
+	],
 	"name": "jweiland/pforum",
 	"type": "typo3-cms-extension",
 	"description": "Lightweight forum extension for TYPO3",
@@ -18,7 +21,8 @@
 		"source": "https://github.com/jweiland-net/pforum"
 	},
 	"require": {
-		"typo3/cms-core": "^10.4.32 || ^11.5.16"
+		"typo3/cms-core": "^10.4.32 || ^11.5.16",
+		"webyte/bbb-events": "dev-master@dev"
 	},
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^3.12",

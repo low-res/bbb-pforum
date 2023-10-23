@@ -7,6 +7,11 @@ services:
   JWeiland\Pforum\:
     resource: '../Classes/*'
 
+  JWeiland\Pforum\Command\InformAttendeesAboutNewTopic:
+    tags:
+      - name: 'console.command'
+        command: 'pforum:informattendeesaboutnewtopic'
+
   JWeiland\Pforum\EventListener\AddPaginatorEventListener:
     tags:
     - name: event.listener
