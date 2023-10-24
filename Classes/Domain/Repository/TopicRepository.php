@@ -60,4 +60,14 @@ class TopicRepository extends Repository implements HiddenRepositoryInterface
 
         return null;
     }
+
+    public function findUnsendTopics()
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+
+        $topics = $query->matching($query->equals('attendees_informed',0))->execute();
+
+        return $topics;
+    }
 }
