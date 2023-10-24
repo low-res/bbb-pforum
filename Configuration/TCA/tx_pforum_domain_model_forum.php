@@ -161,5 +161,16 @@ return [
                 ],
             ],
         ],
+        'event' => [
+            'exclude' => true,
+            'label' => 'LLL:EXT:pforum/Resources/Private/Language/locallang_db.xlf:tx_pforum_domain_model_forum.event',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'foreign_table' => 'tx_bbbevents_domain_model_event',
+                'minitems' => 0,
+                'maxitems' => 1,
+            ],
+        ]
     ],
 ];

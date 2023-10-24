@@ -3,19 +3,23 @@
 namespace JWeiland\Pforum\Command;
 
 
+use JWeiland\Pforum\Domain\Model\Topic;
+use JWeiland\Pforum\Domain\Repository\TopicRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mime\Address;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Mail\FluidEmail;
 use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\RootlineUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use Webyte\BbbEvents\Domain\Model\Attendee;
-use Webyte\BbbEvents\Domain\Model\Comittee;
 use Webyte\BbbEvents\Domain\Repository\AttendeeRepository;
-use Webyte\BbbEvents\Domain\Service\AttendeeService;
 
 
 class InformAttendeesAboutNewTopic extends Command
@@ -30,16 +34,17 @@ class InformAttendeesAboutNewTopic extends Command
 
 
     /**
+     * topicRepository
+     *
+     * @var TopicRepository
+     */
+    protected $topicRepository = null;
+
+
+    /**
      * @var SiteFinder
      */
     protected $sitefinder = null;
-
-
-    /** @var AttendeeService */
-    protected $attendeeService;
-
-
-    private $registrationPageUid;
 
 
     /**
@@ -60,22 +65,30 @@ class InformAttendeesAboutNewTopic extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->registrationPageUid = $input->getArgument('registrationPageUid');
 
-        $attendees = $this->attendeeRepository->getUninvitedAttendees();
+        $topics = $this->topicRepository->findUnsendTopics();
 
         /** @var Logger $logger */
         $logger = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Log\LogManager::class)->getLogger(__CLASS__);
         $logger->notice('Start sending Information about Topics');
 
-        /** @var Attendee $attendee */
-        foreach ($attendees as $attendee) {
-            $logger->notice('Invite Attendee '.$attendee->getUid()." ".$attendee->getEmail());
-            $this->sendInvitationMail($attendee);
-            $this->markAttendeeAsInvited($attendee);
+        /** @var Topic $topic */
+        foreach ($topics as $topic) {
+            $attendees = $this->getAttendeesForTopic($topic);
+            if(count($attendees) == 0) {
+                $logger->notice('No Attendees found for Topic '.$topic->getUid()." ".$topic->getTitle());
+                $topic->setAttendeesInformed( 2 );
+            } else {
+                /** @var Attendee $attendee */
+                foreach ($attendees as $attendee) {
+                    $logger->notice('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
+                    $this->sendTopicInfo($topic, $attendee);
+                }
+                $topic->setAttendeesInformed( 1 );
+            }
+
         }
-        $this->attendeeRepository->forcePersist();
-        $logger->notice('Finished sending Invitations');
+        $logger->notice('Finished sending topic infos');
         return 0;
     }
 
@@ -90,11 +103,11 @@ class InformAttendeesAboutNewTopic extends Command
 
 
     /**
-     * @param  AttendeeService  $attendeeService
+     * @param  TopicRepository  $topicRepository
      */
-    public function injectAttendeeService(AttendeeService $attendeeService)
+    public function injectTopicRepository(TopicRepository $topicRepository)
     {
-        $this->attendeeService = $attendeeService;
+        $this->topicRepository = $topicRepository;
     }
 
 
@@ -110,62 +123,70 @@ class InformAttendeesAboutNewTopic extends Command
     /**
      * @param  Attendee  $attendee
      */
-    private function sendInvitationMail(Attendee $attendee)
+    private function sendTopicInfo(Topic $topic, Attendee $attendee)
     {
 
         // Create the message
         /** @var FluidEmail $mail */
         $mail = GeneralUtility::makeInstance(FluidEmail::class);
 
-        /** @var Comittee $comitee */
-        $comitee = $attendee->getContingent()->getComitee();
+        $templateName = 'TopicInfo';
 
-        $templateName = 'Invitation';
-        if ($attendee->getFeuser()) {
-            $templateName = 'InvitationnoteForExistingUser';
-        }
-
-        $this->attendeeService->setRegistrationPageId($this->registrationPageUid);
-        $registrationlink = $this->attendeeService->getRegistrationUrl($attendee);
-        $preparedMailtext = $this->replacePlaceholdersInText($comitee->getEventstext(), $attendee);
-
-        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($this->registrationPageUid);
+        $forumCeUid = $this->getPageWithForumCeForTopic($topic);
+        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($forumCeUid);
         $baseUri = (string) $site->getBase();
 
-        if ($attendee->getFeuser()) {
-            $registrationlink = $baseUri;
-        }
+
 
         // Prepare and send the message
         $mail
 
             // Give the message a subject
-            ->subject($comitee->getMailsubject())
+            ->subject("Neues Thema im Forum: ".$topic->getTitle())
 
             // Set the To addresses with an associative array
             ->to($attendee->getEmail())
             ->format('html')
             ->setTemplate($templateName)
-            ->assign('headline', 'Einladung')
-            ->assign('attendee', $attendee)
-            ->assign('mailtext', $preparedMailtext)
-            ->assign('latestregister', $comitee->getLatestregister())
-            ->assign('registrationcode', $attendee->getRegistrationCode())
-            ->assign('registrationurl', $registrationlink)
-            ->assign('mailsubject', $comitee->getMailsubject())
-            ->assign('baseUri', $baseUri);
+            ->assign('headline', 'Forum');
 
         if (!empty($attendee->getContingent()->getComitee()->getEvent()->getSendingMailFromAddress())) {
             $event = $attendee->getContingent()->getComitee()->getEvent();
             $mail->from(new Address($event->getSendingMailFromAddress(), $event->getSendingMailFromName()));
         }
 
-        $attendee->addLogentry("Mailtemplate: ".$templateName.", Registrationlink ".$registrationlink);
+        $attendee->addLogentry("Mailtemplate: ".$templateName.", Foruminfo Mail ".$topic->getTitle());
 
         $mailer = GeneralUtility::makeInstance(Mailer::class);
         $mailer->send($mail);
-        $attendee->addLogentry("Mailer Debuginfo: ".$mailer->getSentMessage()->getDebug());
         $this->attendeeRepository->update($attendee);
+    }
+
+    private function getAttendeesForTopic(Topic $topic): array
+    {
+        $attendees = [];
+        $eventId = $topic->getForum()?->getEvent();
+
+        if( $eventId )
+        {
+            $attendees = $this->attendeeRepository->findAttendeesByEvent($eventId);
+        }
+
+
+        return $attendees;
+    }
+
+    private function getPageWithForumCeForTopic(Topic $topic)
+    {
+        $pidOfForum = $topic->getForum()->getPid();
+        $pageId = 0; // get the site that has a tt_content with list_type "pforum_forum" and pages contains  $pidOfForum
+        return $pageId;
+    }
+
+
+    public function injectAttendeeService()
+    {
+
     }
 
 }

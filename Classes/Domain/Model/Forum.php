@@ -37,6 +37,13 @@ class Forum extends AbstractEntity
      */
     protected $topics;
 
+    /**
+     * event
+     *
+     * @var int
+     */
+    protected $event = 0;
+
     public function __construct()
     {
         $this->topics = new ObjectStorage();
@@ -81,4 +88,18 @@ class Forum extends AbstractEntity
     {
         $this->topics = $topics;
     }
+
+
+    public function getEvent(): int
+    {
+        return $this->event;
+    }
+
+
+    public function setEvent(int $event): void
+    {
+        $this->event = $event;
+    }
+
+
 }
