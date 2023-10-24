@@ -28,7 +28,7 @@ return [
     ],
     'types' => [
         '1' => [
-            'showitem' => '--palette--;;languageHidden, title, teaser, topics,
+            'showitem' => '--palette--;;languageHidden, title, teaser,event, topics,
             --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.tabs.access, 
             --palette--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.palettes.access;access'
         ],
@@ -164,6 +164,7 @@ return [
         'event' => [
             'exclude' => true,
             'label' => 'LLL:EXT:pforum/Resources/Private/Language/locallang_db.xlf:tx_pforum_domain_model_forum.event',
+            'description' => 'Die Veranstaltung, zu der dieses Forum gehört und deren Teilnehmer über neue Themen informiert werden sollen.',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
