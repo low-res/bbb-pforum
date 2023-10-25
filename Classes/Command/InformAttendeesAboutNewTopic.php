@@ -9,17 +9,15 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mime\Address;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Log\Logger;
 use TYPO3\CMS\Core\Mail\FluidEmail;
 use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Site\SiteFinder;
-use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\RootlineUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use Webyte\BbbEvents\Domain\Model\Attendee;
 use Webyte\BbbEvents\Domain\Repository\AttendeeRepository;
+use Webyte\BbbEvents\Domain\Repository\EventRepository;
+use Webyte\BbbEvents\Domain\Service\AttendeeService;
 
 
 class InformAttendeesAboutNewTopic extends Command
@@ -31,6 +29,14 @@ class InformAttendeesAboutNewTopic extends Command
      * @var AttendeeRepository
      */
     protected $attendeeRepository = null;
+
+    /**
+     * eventRepository
+     *
+     * @var EventRepository
+     */
+    protected $eventRepository = null;
+
 
 
     /**
@@ -65,7 +71,6 @@ class InformAttendeesAboutNewTopic extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-
         $topics = $this->topicRepository->findUnsendTopics();
 
         /** @var Logger $logger */
@@ -75,19 +80,23 @@ class InformAttendeesAboutNewTopic extends Command
         /** @var Topic $topic */
         foreach ($topics as $topic) {
             $attendees = $this->getAttendeesForTopic($topic);
-            if(count($attendees) == 0) {
-                $logger->notice('No Attendees found for Topic '.$topic->getUid()." ".$topic->getTitle());
-                $topic->setAttendeesInformed( 2 );
+            if (count($attendees) == 0) {
+                $logger->error('No Attendees found for Topic '.$topic->getUid()." ".$topic->getTitle());
+                $topic->setAttendeesInformed(2);
             } else {
                 /** @var Attendee $attendee */
                 foreach ($attendees as $attendee) {
-                    $logger->notice('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
+                    $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
                     $this->sendTopicInfo($topic, $attendee);
                 }
-                $topic->setAttendeesInformed( 1 );
+                $topic->setAttendeesInformed(1);
             }
+            $this->topicRepository->update($topic);
 
         }
+        $this->topicRepository->forcePersist();
+
+
         $logger->notice('Finished sending topic infos');
         return 0;
     }
@@ -101,6 +110,13 @@ class InformAttendeesAboutNewTopic extends Command
         $this->attendeeRepository = $attendeeRepository;
     }
 
+    /**
+     * @param  EventRepository  $eventRepository
+     */
+    public function injectEventRepository(EventRepository $eventRepository)
+    {
+        $this->eventRepository = $eventRepository;
+    }
 
     /**
      * @param  TopicRepository  $topicRepository
@@ -130,17 +146,16 @@ class InformAttendeesAboutNewTopic extends Command
         /** @var FluidEmail $mail */
         $mail = GeneralUtility::makeInstance(FluidEmail::class);
 
-        $templateName = 'TopicInfo';
+        $templateName = 'ForumNewTopicInfo';
 
-        $forumCeUid = $this->getPageWithForumCeForTopic($topic);
-        $site = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($forumCeUid);
-        $baseUri = (string) $site->getBase();
-
-
+        $event = $attendee->getContingent()->getComitee()->getEvent();
+        $email = $topic->getFrontendUser()->getEmail();
+        $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
+        $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
+        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema im Forum zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die Event-App , um auf das Thema zu antworten.";
 
         // Prepare and send the message
         $mail
-
             // Give the message a subject
             ->subject("Neues Thema im Forum: ".$topic->getTitle())
 
@@ -148,18 +163,21 @@ class InformAttendeesAboutNewTopic extends Command
             ->to($attendee->getEmail())
             ->format('html')
             ->setTemplate($templateName)
-            ->assign('headline', 'Forum');
+            ->assign('headline', "Neues Thema im Forum: ".$topic->getTitle())
+            ->assign('attendee', $attendee)
+            ->assign('mailtext', $mailtext);
 
         if (!empty($attendee->getContingent()->getComitee()->getEvent()->getSendingMailFromAddress())) {
             $event = $attendee->getContingent()->getComitee()->getEvent();
             $mail->from(new Address($event->getSendingMailFromAddress(), $event->getSendingMailFromName()));
         }
 
-        $attendee->addLogentry("Mailtemplate: ".$templateName.", Foruminfo Mail ".$topic->getTitle());
+        $attendee->addLogentry("Foruminfo Mail ".$topic->getTitle());
 
         $mailer = GeneralUtility::makeInstance(Mailer::class);
         $mailer->send($mail);
         $this->attendeeRepository->update($attendee);
+
     }
 
     private function getAttendeesForTopic(Topic $topic): array
@@ -167,20 +185,13 @@ class InformAttendeesAboutNewTopic extends Command
         $attendees = [];
         $eventId = $topic->getForum()?->getEvent();
 
-        if( $eventId )
-        {
-            $attendees = $this->attendeeRepository->findAttendeesByEvent($eventId);
+        if ($eventId) {
+            $event = $this->eventRepository->findByUid($eventId);
+            $attendees = $this->attendeeRepository->findAttendeesByEvent($event)->toArray();
         }
 
 
         return $attendees;
-    }
-
-    private function getPageWithForumCeForTopic(Topic $topic)
-    {
-        $pidOfForum = $topic->getForum()->getPid();
-        $pageId = 0; // get the site that has a tt_content with list_type "pforum_forum" and pages contains  $pidOfForum
-        return $pageId;
     }
 
 
