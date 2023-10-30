@@ -29,7 +29,7 @@ return [
     'types' => [
         '1' => [
             'showitem' => '--palette--;;languageHidden, title, description,
-            anonymous_user, frontend_user, images,
+            anonymous_user, frontend_user, images, attendees_informed,
             --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.tabs.access, 
             --palette--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:pages.palettes.access;access'
         ],
@@ -189,6 +189,18 @@ return [
             'config' => [
                 'type' => 'passthrough',
             ],
+        ],
+        'attendees_informed' => [
+            'exclude' => true,
+            'label' => 'Teilnehmer über dieses Thema benachrictigt',
+            'config' => [
+                'type' => 'check',
+                'items' => [
+                    '1' => [
+                        '0' => 'benachrichtigt'
+                    ]
+                ]
+            ]
         ],
     ],
 ];
