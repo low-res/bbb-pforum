@@ -3,6 +3,7 @@
 namespace JWeiland\Pforum\Command;
 
 
+use FluidTYPO3\Vhs\ViewHelpers\DebugViewHelper;
 use JWeiland\Pforum\Domain\Model\Post;
 use JWeiland\Pforum\Domain\Model\Topic;
 use JWeiland\Pforum\Domain\Repository\PostRepository;
@@ -16,6 +17,7 @@ use TYPO3\CMS\Core\Mail\FluidEmail;
 use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use Webyte\BbbEvents\Domain\Model\Attendee;
 use Webyte\BbbEvents\Domain\Repository\AttendeeRepository;
 use Webyte\BbbEvents\Domain\Repository\EventRepository;
@@ -105,11 +107,11 @@ class InformAttendeesAboutNewPosts extends Command
 
 
     /**
-     * @param  PostRepository  $postRepo
+     * @param  AttendeeRepository  $attendeeRepository
      */
-    public function injectAttendeeRepository(PostRepository $postRepo)
+    public function injectAttendeeRepository(AttendeeRepository $attendeeRepository)
     {
-        $this->postRepository = $postRepo;
+        $this->attendeeRepository = $attendeeRepository;
     }
 
     /**
@@ -190,7 +192,7 @@ class InformAttendeesAboutNewPosts extends Command
 
         if ($eventId) {
             $event = $this->eventRepository->findByUid($eventId);
-            $attendees = $this->attendeeRepository->findAttendeesByEvent($event)->toArray();
+            if($event) $attendees = $this->attendeeRepository->findAttendeesByEvent($event)->toArray();
         }
 
         return $attendees;
