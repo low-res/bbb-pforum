@@ -73,7 +73,7 @@ class InformAttendeesAboutNewPosts extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $posts = $this->postRepository->findUnsendTopics();
+        $posts = $this->postRepository->findUnsendPosts();
 
         /** @var Logger $logger */
         $logger = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Log\LogManager::class)->getLogger(__CLASS__);
@@ -121,11 +121,11 @@ class InformAttendeesAboutNewPosts extends Command
     }
 
     /**
-     * @param  TopicRepository  $topicRepository
+     * @param  PostRepository  $postRepository
      */
-    public function injectTopicRepository(TopicRepository $topicRepository)
+    public function injectPostRepository(PostRepository $postRepository)
     {
-        $this->postRepository = $topicRepository;
+        $this->postRepository = $postRepository;
     }
 
 
