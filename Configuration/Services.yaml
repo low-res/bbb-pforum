@@ -12,6 +12,11 @@ services:
       - name: 'console.command'
         command: 'pforum:informattendeesaboutnewtopic'
 
+  JWeiland\Pforum\Command\InformAttendeesAboutNewPosts:
+    tags:
+      - name: 'console.command'
+        command: 'pforum:informattendeesaboutnewpost'
+
   JWeiland\Pforum\EventListener\AddPaginatorEventListener:
     tags:
     - name: event.listener

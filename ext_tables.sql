@@ -31,7 +31,8 @@ CREATE TABLE tx_pforum_domain_model_post (
 	anonymous_user int(11) unsigned DEFAULT '0',
 	frontend_user int(11) unsigned DEFAULT '0',
 	images int(11) unsigned DEFAULT '0' NOT NULL,
-	topic int(11) unsigned DEFAULT '0' NOT NULL
+	topic int(11) unsigned DEFAULT '0' NOT NULL,
+    attendees_informed smallint(5) unsigned NOT NULL DEFAULT '0',
 );
 
 #

@@ -59,4 +59,19 @@ class PostRepository extends Repository implements HiddenRepositoryInterface
 
         return null;
     }
+
+    public function findUnsendPosts()
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+
+        $posts = $query->matching($query->equals('attendees_informed',0))->execute();
+
+        return $posts;
+    }
+
+    public function forcePersist()
+    {
+        $this->persistenceManager->persistAll();
+    }
 }

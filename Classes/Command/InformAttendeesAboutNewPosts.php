@@ -3,7 +3,9 @@
 namespace JWeiland\Pforum\Command;
 
 
+use JWeiland\Pforum\Domain\Model\Post;
 use JWeiland\Pforum\Domain\Model\Topic;
+use JWeiland\Pforum\Domain\Repository\PostRepository;
 use JWeiland\Pforum\Domain\Repository\TopicRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,7 +22,7 @@ use Webyte\BbbEvents\Domain\Repository\EventRepository;
 use Webyte\BbbEvents\Domain\Service\AttendeeService;
 
 
-class InformAttendeesAboutNewTopic extends Command
+class InformAttendeesAboutNewPosts extends Command
 {
 
     /**
@@ -42,9 +44,9 @@ class InformAttendeesAboutNewTopic extends Command
     /**
      * topicRepository
      *
-     * @var TopicRepository
+     * @var PostRepository
      */
-    protected $topicRepository = null;
+    protected $postRepository = null;
 
 
     /**
@@ -58,8 +60,8 @@ class InformAttendeesAboutNewTopic extends Command
      */
     protected function configure()
     {
-        $this->setDescription('Sends e-mails to all attendees about a new topic in the forum')
-            ->setHelp('It looks for all new topics and sends out an e-mail informing about that')
+        $this->setDescription('Sends e-mails to all attendees about a new posts in the forum')
+            ->setHelp('It looks for all new posts and sends out an e-mail informing about that')
 //            ->addArgument(
 //                'registrationPageUid',
 //                InputArgument::REQUIRED,
@@ -71,30 +73,30 @@ class InformAttendeesAboutNewTopic extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $topics = $this->topicRepository->findUnsendTopics();
+        $posts = $this->postRepository->findUnsendTopics();
 
         /** @var Logger $logger */
         $logger = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Log\LogManager::class)->getLogger(__CLASS__);
-        $logger->notice('Start sending Information about Topics');
+        $logger->notice('Start sending Information about Posts');
 
-        /** @var Topic $topic */
-        foreach ($topics as $topic) {
-            $attendees = $this->getAttendeesForTopic($topic);
+        /** @var Post $post */
+        foreach ($posts as $post) {
+            $attendees = $this->getAttendeesForPost($post);
             if (count($attendees) == 0) {
-                $logger->error('No Attendees found for Topic '.$topic->getUid()." ".$topic->getTitle());
-                $topic->setAttendeesInformed(2);
+                $logger->error('No Attendees found for Post '.$post->getUid()." ".$post->getTitle());
+                $post->setAttendeesInformed(2);
             } else {
                 /** @var Attendee $attendee */
                 foreach ($attendees as $attendee) {
-                    $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
-                    $this->sendTopicInfo($topic, $attendee);
+                    $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Post {$post->getUid()} ({$post->getTitle()})");
+                    $this->sendPostInfo($post, $attendee);
                 }
-                $topic->setAttendeesInformed(1);
+                $post->setAttendeesInformed(1);
             }
-            $this->topicRepository->update($topic);
+            $this->postRepository->update($post);
 
         }
-        $this->topicRepository->forcePersist();
+        $this->postRepository->forcePersist();
 
 
         $logger->notice('Finished sending topic infos');
@@ -103,11 +105,11 @@ class InformAttendeesAboutNewTopic extends Command
 
 
     /**
-     * @param  AttendeeRepository  $attendeeRepository
+     * @param  PostRepository  $postRepo
      */
-    public function injectAttendeeRepository(AttendeeRepository $attendeeRepository)
+    public function injectAttendeeRepository(PostRepository $postRepo)
     {
-        $this->attendeeRepository = $attendeeRepository;
+        $this->postRepository = $postRepo;
     }
 
     /**
@@ -123,7 +125,7 @@ class InformAttendeesAboutNewTopic extends Command
      */
     public function injectTopicRepository(TopicRepository $topicRepository)
     {
-        $this->topicRepository = $topicRepository;
+        $this->postRepository = $topicRepository;
     }
 
 
@@ -139,7 +141,7 @@ class InformAttendeesAboutNewTopic extends Command
     /**
      * @param  Attendee  $attendee
      */
-    private function sendTopicInfo(Topic $topic, Attendee $attendee)
+    private function sendPostInfo(Post $post, Attendee $attendee)
     {
 
         // Create the message
@@ -149,21 +151,22 @@ class InformAttendeesAboutNewTopic extends Command
         $templateName = 'ForumNewTopicInfo';
 
         $event = $attendee->getContingent()->getComitee()->getEvent();
-        $email = $topic->getFrontendUser()->getEmail();
+        $topicTitle = $post->getTopic()?->getTitle();
+        $email = $post->getFrontendUser()->getEmail();
         $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
         $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
-        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema am Schwarzen Brett zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die Event-App , um auf das Thema zu antworten.";
+        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat einen neuen Beitrag am Schwarzen Brett zum Thema <strong>{$topicTitle}</strong> erstellt:<br><br><hr><strong>{$post->getTitle()}</strong><br>".$post->getDescription()."<hr><br><br>Öffnene Sie die Event-App , um auf den Beitrag zu antworten.";
 
         // Prepare and send the message
         $mail
             // Give the message a subject
-            ->subject("Neues Thema am Schwarzen Brett: ".$topic->getTitle())
+            ->subject("Neuer Beitrag am Schwarzen Brett: ".$post->getTitle())
 
             // Set the To addresses with an associative array
             ->to($attendee->getEmail())
             ->format('html')
             ->setTemplate($templateName)
-            ->assign('headline', "Neues Thema am Schwarzen Brett: ".$topic->getTitle() )
+            ->assign('headline', "Neuer Beitrag am Schwarzen Brett: ".$post->getTitle())
             ->assign('attendee', $attendee)
             ->assign('mailtext', $mailtext);
 
@@ -172,7 +175,7 @@ class InformAttendeesAboutNewTopic extends Command
             $mail->from(new Address($event->getSendingMailFromAddress(), $event->getSendingMailFromName()));
         }
 
-        $attendee->addLogentry("Foruminfo Mail ".$topic->getTitle());
+        $attendee->addLogentry("Foruminfo Mail ".$post->getTitle());
 
         $mailer = GeneralUtility::makeInstance(Mailer::class);
         $mailer->send($mail);
@@ -180,16 +183,15 @@ class InformAttendeesAboutNewTopic extends Command
 
     }
 
-    private function getAttendeesForTopic(Topic $topic): array
+    private function getAttendeesForPost(Post $post): array
     {
         $attendees = [];
-        $eventId = $topic->getForum()?->getEvent();
+        $eventId = $post->getTopic()?->getForum()?->getEvent();
 
         if ($eventId) {
             $event = $this->eventRepository->findByUid($eventId);
             $attendees = $this->attendeeRepository->findAttendeesByEvent($event)->toArray();
         }
-
 
         return $attendees;
     }

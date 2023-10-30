@@ -67,6 +67,13 @@ class Post extends AbstractEntity
         $this->images = new ObjectStorage();
     }
 
+    /**
+     * attendeesInformed
+     *
+     * @var int
+     */
+    protected $attendeesInformed = 0;
+
     public function getHidden(): bool
     {
         return $this->hidden;
@@ -179,4 +186,18 @@ class Post extends AbstractEntity
     {
         $this->images = $images;
     }
+
+
+    public function getAttendeesInformed(): int
+    {
+        return $this->attendeesInformed;
+    }
+
+
+    public function setAttendeesInformed(int $attendeesInformed): void
+    {
+        $this->attendeesInformed = $attendeesInformed;
+    }
+
+
 }
