@@ -157,7 +157,7 @@ class InformAttendeesAboutNewPosts extends Command
         $email = $post->getFrontendUser()->getEmail();
         $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
         $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
-        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat einen neuen Beitrag am Schwarzen Brett zum Thema <strong>{$topicTitle}</strong> erstellt:<br><br><hr><strong>{$post->getTitle()}</strong><br>".$post->getDescription()."<hr><br><br>Öffnene Sie die Event-App , um auf den Beitrag zu antworten.";
+        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat einen neuen Beitrag am Schwarzen Brett der Veranstaltung <strong>{$event->getTitle()}</strong> zum Thema <strong>{$topicTitle}</strong> erstellt:<br><br><hr><strong>{$post->getTitle()}</strong><br>".$post->getDescription()."<hr><br><br>Öffnene Sie die Event-App , um auf den Beitrag zu antworten.";
 
         // Prepare and send the message
         $mail
