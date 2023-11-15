@@ -153,7 +153,7 @@ class InformAttendeesAboutNewTopic extends Command
         $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
         $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
         $deeplink = $this->createLinkToPage($event->getRootpageuid());
-        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema am Schwarzen Brett zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die <a href='".$deeplink."'>Event-App</a> , um auf das Thema zu antworten.";
+        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema am Schwarzen Brett zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die <a href='".$deeplink."'>Event-App</a> , um auf das Thema zu antworten: ".$deeplink;
 
         // Prepare and send the message
         $mail
