@@ -152,7 +152,8 @@ class InformAttendeesAboutNewTopic extends Command
         $email = $topic->getFrontendUser()->getEmail();
         $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
         $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
-        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema am Schwarzen Brett zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die Event-App , um auf das Thema zu antworten.";
+        $deeplink = $this->createLinkToPage($event->getRootpageuid());
+        $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema am Schwarzen Brett zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die <a href='".$deeplink."'>Event-App</a> , um auf das Thema zu antworten.";
 
         // Prepare and send the message
         $mail
@@ -198,6 +199,13 @@ class InformAttendeesAboutNewTopic extends Command
     public function injectAttendeeService()
     {
 
+    }
+
+    private function createLinkToPage($pid, $params = [])
+    {
+        return $this->sitefinder->getSiteByPageId($pid)
+            ->getRouter()
+            ->generateUri($pid, $params);
     }
 
 }
