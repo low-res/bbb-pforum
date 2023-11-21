@@ -82,23 +82,28 @@ class InformAttendeesAboutNewTopic extends Command
             $attendees = $this->getAttendeesForTopic($topic);
             if (count($attendees) == 0) {
                 $logger->error('No Attendees found for Topic '.$topic->getUid()." ".$topic->getTitle());
-                $topic->setAttendeesInformed(2);
+                $this->changeTopicAttendeesInformedFlag($topic, 2);
+
             } else {
+                $this->changeTopicAttendeesInformedFlag($topic, 1);
+
                 /** @var Attendee $attendee */
                 foreach ($attendees as $attendee) {
                     $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
                     $this->sendTopicInfo($topic, $attendee);
                 }
-                $topic->setAttendeesInformed(1);
             }
-            $this->topicRepository->update($topic);
-
         }
-        $this->topicRepository->forcePersist();
-
 
         $logger->notice('Finished sending topic infos');
         return 0;
+    }
+
+    private function changeTopicAttendeesInformedFlag(Topic $topic, int = 1)
+    {
+        $topic->setAttendeesInformed(2);
+        $this->topicRepository->update($topic);
+        $this->topicRepository->forcePersist();
     }
 
 

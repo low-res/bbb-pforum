@@ -86,23 +86,27 @@ class InformAttendeesAboutNewPosts extends Command
             $attendees = $this->getAttendeesForPost($post);
             if (count($attendees) == 0) {
                 $logger->error('No Attendees found for Post '.$post->getUid()." ".$post->getTitle());
-                $post->setAttendeesInformed(2);
+                $this->changePostAttendeesInformedFlag($post, 2);
             } else {
+                $this->changePostAttendeesInformedFlag($post, 1);
                 /** @var Attendee $attendee */
                 foreach ($attendees as $attendee) {
                     $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Post {$post->getUid()} ({$post->getTitle()})");
                     $this->sendPostInfo($post, $attendee);
                 }
-                $post->setAttendeesInformed(1);
             }
-            $this->postRepository->update($post);
-
         }
         $this->postRepository->forcePersist();
 
-
         $logger->notice('Finished sending topic infos');
         return 0;
+    }
+
+    private function changePostAttendeesInformedFlag(Post $post, int = 1)
+    {
+        $post->setAttendeesInformed(2);
+        $this->postRepository->update($post);
+        $this->postRepository->forcePersist();
     }
 
 
