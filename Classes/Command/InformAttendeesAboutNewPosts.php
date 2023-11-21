@@ -102,9 +102,9 @@ class InformAttendeesAboutNewPosts extends Command
         return 0;
     }
 
-    private function changePostAttendeesInformedFlag(Post $post, int = 1)
+    private function changePostAttendeesInformedFlag(Post $post, int $newStatus = 1)
     {
-        $post->setAttendeesInformed(2);
+        $post->setAttendeesInformed($newStatus);
         $this->postRepository->update($post);
         $this->postRepository->forcePersist();
     }

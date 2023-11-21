@@ -99,9 +99,9 @@ class InformAttendeesAboutNewTopic extends Command
         return 0;
     }
 
-    private function changeTopicAttendeesInformedFlag(Topic $topic, int = 1)
+    private function changeTopicAttendeesInformedFlag(Topic $topic, int $newStatus = 1)
     {
-        $topic->setAttendeesInformed(2);
+        $topic->setAttendeesInformed($newStatus);
         $this->topicRepository->update($topic);
         $this->topicRepository->forcePersist();
     }
