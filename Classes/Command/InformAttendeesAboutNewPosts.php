@@ -164,6 +164,9 @@ class InformAttendeesAboutNewPosts extends Command
         $deeplink = $this->createLinkToPage($event->getRootpageuid());
         $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat einen neuen Beitrag am Schwarzen Brett der Veranstaltung <strong>{$event->getTitle()}</strong> zum Thema <strong>{$topicTitle}</strong> erstellt:<br><br><hr><strong>{$post->getTitle()}</strong><br>".$post->getDescription()."<hr><br><br>Öffnene Sie die <a href='".$deeplink."'>Event-App</a> , um auf den Beitrag zu antworten: ".$deeplink;
 
+        $site = $this->sitefinder->getSiteByPageId( $event->getRootpageuid() );
+        $baseUri = (string)$site->getBase();
+
         // Prepare and send the message
         $mail
             // Give the message a subject
@@ -175,6 +178,7 @@ class InformAttendeesAboutNewPosts extends Command
             ->setTemplate($templateName)
             ->assign('headline', "Neuer Beitrag am Schwarzen Brett: ".$post->getTitle())
             ->assign('attendee', $attendee)
+            ->assign('baseUri', $baseUri)
             ->assign('mailtext', $mailtext);
 
         if (!empty($attendee->getContingent()->getComitee()->getEvent()->getSendingMailFromAddress())) {

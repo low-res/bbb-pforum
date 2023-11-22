@@ -83,7 +83,6 @@ class InformAttendeesAboutNewTopic extends Command
             if (count($attendees) == 0) {
                 $logger->error('No Attendees found for Topic '.$topic->getUid()." ".$topic->getTitle());
                 $this->changeTopicAttendeesInformedFlag($topic, 2);
-
             } else {
                 $this->changeTopicAttendeesInformedFlag($topic, 1);
 
@@ -160,6 +159,9 @@ class InformAttendeesAboutNewTopic extends Command
         $deeplink = $this->createLinkToPage($event->getRootpageuid());
         $mailtext = "der Teilnehmer <strong>{$creatorName}</strong> hat ein neues Thema am Schwarzen Brett zur Veranstaltung <strong>{$event->getTitle()}</strong> erstellt:<br><br><hr><strong>{$topic->getTitle()}</strong><br>".$topic->getDescription()."<hr><br><br>Öffnene Sie die <a href='".$deeplink."'>Event-App</a> , um auf das Thema zu antworten: ".$deeplink;
 
+        $site = $this->sitefinder->getSiteByPageId( $event->getRootpageuid() );
+        $baseUri = (string)$site->getBase();
+
         // Prepare and send the message
         $mail
             // Give the message a subject
@@ -171,6 +173,7 @@ class InformAttendeesAboutNewTopic extends Command
             ->setTemplate($templateName)
             ->assign('headline', "Neues Thema am Schwarzen Brett: ".$topic->getTitle() )
             ->assign('attendee', $attendee)
+            ->assign('baseUri', $baseUri)
             ->assign('mailtext', $mailtext);
 
         if (!empty($attendee->getContingent()->getComitee()->getEvent()->getSendingMailFromAddress())) {
