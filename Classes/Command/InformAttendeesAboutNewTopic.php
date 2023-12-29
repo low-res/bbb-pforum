@@ -88,7 +88,7 @@ class InformAttendeesAboutNewTopic extends Command
 
                 /** @var Attendee $attendee */
                 foreach ($attendees as $attendee) {
-                    $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
+                    $logger->notice('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Topic {$topic->getUid()} ({$topic->getTitle()})");
                     $this->sendTopicInfo($topic, $attendee);
                 }
             }

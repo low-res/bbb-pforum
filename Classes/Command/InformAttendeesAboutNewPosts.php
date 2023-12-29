@@ -91,7 +91,7 @@ class InformAttendeesAboutNewPosts extends Command
                 $this->changePostAttendeesInformedFlag($post, 1);
                 /** @var Attendee $attendee */
                 foreach ($attendees as $attendee) {
-                    $logger->error('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Post {$post->getUid()} ({$post->getTitle()})");
+                    $logger->notice('Inform Attendee '.$attendee->getUid()." ".$attendee->getEmail()." about Post {$post->getUid()} ({$post->getTitle()})");
                     $this->sendPostInfo($post, $attendee);
                 }
             }
