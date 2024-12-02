@@ -40,7 +40,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function getTitleInitiallyReturnsEmptyString()
+    public function getTitleInitiallyReturnsEmptyString(): void
     {
         self::assertSame(
             '',
@@ -51,7 +51,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleSetsTitle()
+    public function setTitleSetsTitle(): void
     {
         $this->subject->setTitle('foo bar');
 
@@ -64,7 +64,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleWithIntegerResultsInString()
+    public function setTitleWithIntegerResultsInString(): void
     {
         $this->subject->setTitle(123);
         self::assertSame('123', $this->subject->getTitle());
@@ -73,7 +73,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleWithBooleanResultsInString()
+    public function setTitleWithBooleanResultsInString(): void
     {
         $this->subject->setTitle(true);
         self::assertSame('1', $this->subject->getTitle());
@@ -82,7 +82,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function getTeaserInitiallyReturnsEmptyString()
+    public function getTeaserInitiallyReturnsEmptyString(): void
     {
         self::assertSame(
             '',
@@ -93,7 +93,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTeaserSetsTeaser()
+    public function setTeaserSetsTeaser(): void
     {
         $this->subject->setTeaser('foo bar');
 
@@ -106,7 +106,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTeaserWithIntegerResultsInString()
+    public function setTeaserWithIntegerResultsInString(): void
     {
         $this->subject->setTeaser(123);
         self::assertSame('123', $this->subject->getTeaser());
@@ -115,7 +115,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTeaserWithBooleanResultsInString()
+    public function setTeaserWithBooleanResultsInString(): void
     {
         $this->subject->setTeaser(true);
         self::assertSame('1', $this->subject->getTeaser());
@@ -124,7 +124,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function getTopicsInitiallyReturnsObjectStorage()
+    public function getTopicsInitiallyReturnsObjectStorage(): void
     {
         self::assertEquals(
             new ObjectStorage(),
@@ -135,7 +135,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTopicsSetsTopics()
+    public function setTopicsSetsTopics(): void
     {
         $object = new Topic();
         $objectStorage = new ObjectStorage();
@@ -151,7 +151,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function addTopicAddsOneTopic()
+    public function addTopicAddsOneTopic(): void
     {
         $objectStorage = new ObjectStorage();
         $this->subject->setTopics($objectStorage);
@@ -170,7 +170,7 @@ class ForumTest extends UnitTestCase
     /**
      * @test
      */
-    public function removeTopicRemovesOneTopic()
+    public function removeTopicRemovesOneTopic(): void
     {
         $object = new Topic();
         $objectStorage = new ObjectStorage();

@@ -38,7 +38,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function getTitleInitiallyReturnsEmptyString()
+    public function getTitleInitiallyReturnsEmptyString(): void
     {
         self::assertSame(
             '',
@@ -49,7 +49,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleSetsTitle()
+    public function setTitleSetsTitle(): void
     {
         $this->subject->setTitle('foo bar');
 
@@ -62,7 +62,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleWithIntegerResultsInString()
+    public function setTitleWithIntegerResultsInString(): void
     {
         $this->subject->setTitle(123);
         self::assertSame('123', $this->subject->getTitle());
@@ -71,7 +71,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleWithBooleanResultsInString()
+    public function setTitleWithBooleanResultsInString(): void
     {
         $this->subject->setTitle(true);
         self::assertSame('1', $this->subject->getTitle());
@@ -80,7 +80,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function getDescriptionInitiallyReturnsEmptyString()
+    public function getDescriptionInitiallyReturnsEmptyString(): void
     {
         self::assertSame(
             '',
@@ -91,7 +91,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function setDescriptionSetsDescription()
+    public function setDescriptionSetsDescription(): void
     {
         $this->subject->setDescription('foo bar');
 
@@ -104,7 +104,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function setDescriptionWithIntegerResultsInString()
+    public function setDescriptionWithIntegerResultsInString(): void
     {
         $this->subject->setDescription(123);
         self::assertSame('123', $this->subject->getDescription());
@@ -113,7 +113,7 @@ class PostTest extends UnitTestCase
     /**
      * @test
      */
-    public function setDescriptionWithBooleanResultsInString()
+    public function setDescriptionWithBooleanResultsInString(): void
     {
         $this->subject->setDescription(true);
         self::assertSame('1', $this->subject->getDescription());

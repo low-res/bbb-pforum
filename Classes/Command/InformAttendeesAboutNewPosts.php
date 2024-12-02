@@ -55,6 +55,13 @@ class InformAttendeesAboutNewPosts extends Command
      * @var SiteFinder
      */
     protected $sitefinder = null;
+    public function __construct(\Webyte\BbbEvents\Domain\Repository\AttendeeRepository $attendeeRepository, \Webyte\BbbEvents\Domain\Repository\EventRepository $eventRepository, \JWeiland\Pforum\Domain\Repository\PostRepository $postRepository, \TYPO3\CMS\Core\Site\SiteFinder $sitefinder)
+    {
+        $this->attendeeRepository = $attendeeRepository;
+        $this->eventRepository = $eventRepository;
+        $this->postRepository = $postRepository;
+        $this->sitefinder = $sitefinder;
+    }
 
 
     /**
@@ -102,7 +109,7 @@ class InformAttendeesAboutNewPosts extends Command
         return 0;
     }
 
-    private function changePostAttendeesInformedFlag(Post $post, int $newStatus = 1)
+    private function changePostAttendeesInformedFlag(Post $post, int $newStatus = 1): void
     {
         $post->setAttendeesInformed($newStatus);
         $this->postRepository->update($post);
@@ -111,43 +118,9 @@ class InformAttendeesAboutNewPosts extends Command
 
 
     /**
-     * @param  AttendeeRepository  $attendeeRepository
-     */
-    public function injectAttendeeRepository(AttendeeRepository $attendeeRepository)
-    {
-        $this->attendeeRepository = $attendeeRepository;
-    }
-
-    /**
-     * @param  EventRepository  $eventRepository
-     */
-    public function injectEventRepository(EventRepository $eventRepository)
-    {
-        $this->eventRepository = $eventRepository;
-    }
-
-    /**
-     * @param  PostRepository  $postRepository
-     */
-    public function injectPostRepository(PostRepository $postRepository)
-    {
-        $this->postRepository = $postRepository;
-    }
-
-
-    /**
-     * @param  SiteFinder  $sitefinder
-     */
-    public function injectSiteFinder(SiteFinder $sitefinder)
-    {
-        $this->sitefinder = $sitefinder;
-    }
-
-
-    /**
      * @param  Attendee  $attendee
      */
-    private function sendPostInfo(Post $post, Attendee $attendee)
+    private function sendPostInfo(Post $post, Attendee $attendee): void
     {
 
         // Create the message

@@ -26,14 +26,14 @@ class User extends AbstractEntity
 
     /**
      * @var string
-     * @Extbase\Validate("JWeiland\Pforum\Validation\Validator\UsernameValidator")
      */
+    #[Extbase\Validate(['validator' => \JWeiland\Pforum\Validation\Validator\UsernameValidator::class])]
     protected $username = '';
 
     /**
      * @var string
-     * @Extbase\Validate("JWeiland\Pforum\Validation\Validator\EmailValidator")
      */
+    #[Extbase\Validate(['validator' => \JWeiland\Pforum\Validation\Validator\EmailValidator::class])]
     protected $email = '';
 
     public function getName(): string

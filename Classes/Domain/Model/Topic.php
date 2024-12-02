@@ -38,27 +38,27 @@ class Topic extends AbstractEntity
 
     /**
      * @var string
-     * @Extbase\Validate("NotEmpty")
      */
+    #[Extbase\Validate(['validator' => 'NotEmpty'])]
     protected $title = '';
 
     /**
      * @var string
-     * @Extbase\Validate("NotEmpty")
      */
+    #[Extbase\Validate(['validator' => 'NotEmpty'])]
     protected $description = '';
 
     /**
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\JWeiland\Pforum\Domain\Model\Post>
-     * @Extbase\ORM\Cascade("remove")
-     * @Extbase\ORM\Lazy
      */
+    #[Extbase\ORM\Cascade(['value' => 'remove'])]
+    #[Extbase\ORM\Lazy]
     protected $posts;
 
     /**
      * @var \JWeiland\Pforum\Domain\Model\AnonymousUser
-     * @Extbase\ORM\Cascade("remove")
      */
+    #[Extbase\ORM\Cascade(['value' => 'remove'])]
     protected $anonymousUser;
 
     /**
@@ -68,8 +68,8 @@ class Topic extends AbstractEntity
 
     /**
      * @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage<\TYPO3\CMS\Extbase\Domain\Model\FileReference>
-     * @Extbase\ORM\Lazy
      */
+    #[Extbase\ORM\Lazy]
     protected $images;
 
 

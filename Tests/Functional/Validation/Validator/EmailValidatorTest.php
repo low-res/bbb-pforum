@@ -62,7 +62,7 @@ class EmailValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillNotAddAnyErrorIfEmailIsNotMandatory()
+    public function validateWillNotAddAnyErrorIfEmailIsNotMandatory(): void
     {
         $this->setEmailIsMandatory(false);
 
@@ -75,7 +75,7 @@ class EmailValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillNotAddAnyErrorIfEmailIsNotString()
+    public function validateWillNotAddAnyErrorIfEmailIsNotString(): void
     {
         $this->setEmailIsMandatory(true);
 
@@ -88,7 +88,7 @@ class EmailValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillNotAddAnyErrorIfEmailIsValidAndIsString()
+    public function validateWillNotAddAnyErrorIfEmailIsValidAndIsString(): void
     {
         $this->setEmailIsMandatory(true);
 
@@ -101,7 +101,7 @@ class EmailValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillAddErrorIfEmailIsStringAndEmpty()
+    public function validateWillAddErrorIfEmailIsStringAndEmpty(): void
     {
         $this->setEmailIsMandatory(true);
 
@@ -122,7 +122,7 @@ class EmailValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillAddErrorIfEmailIsStringAndNotValid()
+    public function validateWillAddErrorIfEmailIsStringAndNotValid(): void
     {
         $this->setEmailIsMandatory(true);
 

@@ -71,7 +71,7 @@ class TopicRepository extends Repository implements HiddenRepositoryInterface
         return $topics;
     }
 
-    public function forcePersist()
+    public function forcePersist(): void
     {
         $this->persistenceManager->persistAll();
     }

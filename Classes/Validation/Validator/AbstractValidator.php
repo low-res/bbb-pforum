@@ -38,13 +38,8 @@ abstract class AbstractValidator extends \TYPO3\CMS\Extbase\Validation\Validator
      */
     protected $settings = [];
 
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
+    public function __construct(\TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager)
     {
         $this->configurationManager = $configurationManager;
-        $this->settings = $this->configurationManager->getConfiguration(
-            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
-            'pforum',
-            'forum'
-        );
     }
 }

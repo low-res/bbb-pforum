@@ -40,7 +40,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function getTitleInitiallyReturnsEmptyString()
+    public function getTitleInitiallyReturnsEmptyString(): void
     {
         self::assertSame(
             '',
@@ -51,7 +51,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleSetsTitle()
+    public function setTitleSetsTitle(): void
     {
         $this->subject->setTitle('foo bar');
 
@@ -64,7 +64,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleWithIntegerResultsInString()
+    public function setTitleWithIntegerResultsInString(): void
     {
         $this->subject->setTitle(123);
         self::assertSame('123', $this->subject->getTitle());
@@ -73,7 +73,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setTitleWithBooleanResultsInString()
+    public function setTitleWithBooleanResultsInString(): void
     {
         $this->subject->setTitle(true);
         self::assertSame('1', $this->subject->getTitle());
@@ -82,7 +82,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function getDescriptionInitiallyReturnsEmptyString()
+    public function getDescriptionInitiallyReturnsEmptyString(): void
     {
         self::assertSame(
             '',
@@ -93,7 +93,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setDescriptionSetsDescription()
+    public function setDescriptionSetsDescription(): void
     {
         $this->subject->setDescription('foo bar');
 
@@ -106,7 +106,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setDescriptionWithIntegerResultsInString()
+    public function setDescriptionWithIntegerResultsInString(): void
     {
         $this->subject->setDescription(123);
         self::assertSame('123', $this->subject->getDescription());
@@ -115,7 +115,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setDescriptionWithBooleanResultsInString()
+    public function setDescriptionWithBooleanResultsInString(): void
     {
         $this->subject->setDescription(true);
         self::assertSame('1', $this->subject->getDescription());
@@ -124,7 +124,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function getPostsInitiallyReturnsObjectStorage()
+    public function getPostsInitiallyReturnsObjectStorage(): void
     {
         self::assertEquals(
             new ObjectStorage(),
@@ -135,7 +135,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function setPostsSetsPosts()
+    public function setPostsSetsPosts(): void
     {
         $object = new Post();
         $objectStorage = new ObjectStorage();
@@ -151,7 +151,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function addPostAddsOnePost()
+    public function addPostAddsOnePost(): void
     {
         $objectStorage = new ObjectStorage();
         $this->subject->setPosts($objectStorage);
@@ -170,7 +170,7 @@ class TopicTest extends UnitTestCase
     /**
      * @test
      */
-    public function removePostRemovesOnePost()
+    public function removePostRemovesOnePost(): void
     {
         $object = new Post();
         $objectStorage = new ObjectStorage();

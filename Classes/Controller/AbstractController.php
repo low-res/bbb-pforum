@@ -69,66 +69,16 @@ class AbstractController extends ActionController
      * @var PersistenceManager
      */
     protected $persistenceManager;
-
-    public function injectExtConf(ExtConf $extConf): void
+    public function __construct(\JWeiland\Pforum\Configuration\ExtConf $extConf, \TYPO3\CMS\Extbase\Persistence\Generic\Session $session, \JWeiland\Pforum\Domain\Repository\ForumRepository $forumRepository, \JWeiland\Pforum\Domain\Repository\TopicRepository $topicRepository, \JWeiland\Pforum\Domain\Repository\PostRepository $postRepository, \JWeiland\Pforum\Domain\Repository\AnonymousUserRepository $anonymousUserRepository, \JWeiland\Pforum\Domain\Repository\FrontendUserRepository $frontendUserRepository, \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager $persistenceManager, protected \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager)
     {
         $this->extConf = $extConf;
-    }
-
-    public function injectSession(Session $session): void
-    {
         $this->session = $session;
-    }
-
-    public function injectForumRepository(ForumRepository $forumRepository): void
-    {
         $this->forumRepository = $forumRepository;
-    }
-
-    public function injectTopicRepository(TopicRepository $topicRepository): void
-    {
         $this->topicRepository = $topicRepository;
-    }
-
-    public function injectPostRepository(PostRepository $postRepository): void
-    {
         $this->postRepository = $postRepository;
-    }
-
-    public function injectAnonymousUserRepository(AnonymousUserRepository $anonymousUserRepository): void
-    {
         $this->anonymousUserRepository = $anonymousUserRepository;
-    }
-
-    public function injectFrontendUserRepository(FrontendUserRepository $frontendUserRepository): void
-    {
         $this->frontendUserRepository = $frontendUserRepository;
-    }
-
-    public function injectPersistenceManager(PersistenceManager $persistenceManager): void
-    {
         $this->persistenceManager = $persistenceManager;
-    }
-
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
-    {
-        $this->configurationManager = $configurationManager;
-        $tsSettings = $this->configurationManager->getConfiguration(
-            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
-            'pforum',
-            'doNotLoadFlexFormSettings'
-        );
-        $mergedSettings = $this->configurationManager->getConfiguration(
-            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS
-        );
-
-        foreach ($mergedSettings as $key => $value) {
-            if (!is_array($value) && empty($value)) {
-                $mergedSettings[$key] = $tsSettings[$key];
-            }
-        }
-
-        $this->settings = $mergedSettings;
     }
 
     public function initializeAction(): void

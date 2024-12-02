@@ -62,7 +62,7 @@ class UsernameValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillNotAddAnyErrorIfUsernameIsNotMandatory()
+    public function validateWillNotAddAnyErrorIfUsernameIsNotMandatory(): void
     {
         $this->setUsernameIsMandatory(false);
 
@@ -75,7 +75,7 @@ class UsernameValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillNotAddAnyErrorIfUsernameIsNotString()
+    public function validateWillNotAddAnyErrorIfUsernameIsNotString(): void
     {
         $this->setUsernameIsMandatory(true);
 
@@ -88,7 +88,7 @@ class UsernameValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillNotAddAnyErrorIfUsernameIsNotEmpty()
+    public function validateWillNotAddAnyErrorIfUsernameIsNotEmpty(): void
     {
         $this->setUsernameIsMandatory(true);
 
@@ -101,7 +101,7 @@ class UsernameValidatorTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function validateWillAddErrorIfUsernameIsEmpty()
+    public function validateWillAddErrorIfUsernameIsEmpty(): void
     {
         $this->setUsernameIsMandatory(true);
 

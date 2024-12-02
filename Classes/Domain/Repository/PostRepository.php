@@ -70,7 +70,7 @@ class PostRepository extends Repository implements HiddenRepositoryInterface
         return $posts;
     }
 
-    public function forcePersist()
+    public function forcePersist(): void
     {
         $this->persistenceManager->persistAll();
     }

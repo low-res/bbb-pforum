@@ -34,12 +34,12 @@ class TopicController extends AbstractController
      */
     protected $frontendGroupHelper;
 
-    public function injectFrontendGroupHelper(FrontendGroupHelper $frontendGroupHelper): void
+    public function __construct(\JWeiland\Pforum\Helper\FrontendGroupHelper $frontendGroupHelper)
     {
         $this->frontendGroupHelper = $frontendGroupHelper;
     }
 
-    public function showAction(Topic $topic): void
+    public function showAction(Topic $topic): \Psr\Http\Message\ResponseInterface
     {
         $posts = $this->postRepository->findByTopic($topic);
 
@@ -61,9 +61,10 @@ class TopicController extends AbstractController
             'posts' => $posts,
                                                   'is_own_topic' => $isOwnTopic
         ]);
+        return $this->htmlResponse();
     }
 
-    public function newAction(Forum $forum): void
+    public function newAction(Forum $forum): \Psr\Http\Message\ResponseInterface
     {
         $this->deleteUploadedFilesOnValidationErrors('topic');
 
@@ -71,6 +72,7 @@ class TopicController extends AbstractController
             'forum' => $forum,
             'topic' => GeneralUtility::makeInstance(Topic::class),
         ]);
+        return $this->htmlResponse();
     }
 
     /**
@@ -81,7 +83,7 @@ class TopicController extends AbstractController
         $this->preProcessControllerAction();
     }
 
-    public function createAction(Forum $forum, Topic $topic): void
+    public function createAction(Forum $forum, Topic $topic)
     {
         // if auth = frontend user
         if ((int)$this->settings['auth'] === 2) {
@@ -94,8 +96,7 @@ class TopicController extends AbstractController
         // if a preview was requested direct to preview action
         if ($this->controllerContext->getRequest()->hasArgument('preview')) {
             $topic->setHidden(true); // topic should not be visible while previewing
-            $this->persistenceManager->persistAll(); // we need an uid before redirecting
-            $this->redirect(
+            $this->persistenceManager->persistAll(); return $this->redirect(
                 'edit',
                 'Topic',
                 'Pforum',
@@ -115,7 +116,7 @@ class TopicController extends AbstractController
         }
 
         $this->addFlashMessageForCreation();
-        $this->redirect('show', 'Forum', 'Pforum', ['forum' => $forum]);
+        return $this->redirect('show', 'Forum', 'Pforum', ['forum' => $forum]);
     }
 
     /**
@@ -133,18 +134,19 @@ class TopicController extends AbstractController
      * @param bool $isPreview If is preview there will be an additional output above edit form
      * @param bool $isNew We need the information if updateAction was called from createAction.
      *                    If so we have to passthrough this information
-     * @Extbase\IgnoreValidation("topic")
      */
+    #[Extbase\IgnoreValidation(['argumentName' => 'topic'])]
     public function editAction(
         Topic $topic = null,
         bool $isPreview = false,
         bool $isNew = false
-    ): void {
+    ): \Psr\Http\Message\ResponseInterface {
         $this->postProcessAndAssignFluidVariables([
             'topic' => $topic,
             'isPreview' => $isPreview,
             'isNew' => $isNew,
         ]);
+        return $this->htmlResponse();
     }
 
     /**
@@ -162,14 +164,14 @@ class TopicController extends AbstractController
      * @param bool $isNew We need the information if updateAction was called from createAction.
      *                    If so we have to add different messages
      */
-    public function updateAction(Topic $topic, bool $isNew = false): void
+    public function updateAction(Topic $topic, bool $isNew = false)
     {
         $this->topicRepository->update($topic);
 
         // if a preview was requested direct to preview action
         if ($this->controllerContext->getRequest()->hasArgument('preview')) {
             $topic->setHidden(true);
-            $this->redirect(
+            return $this->redirect(
                 'edit',
                 'Topic',
                 'Pforum',
@@ -197,7 +199,7 @@ class TopicController extends AbstractController
                 $this->addFlashMessage(LocalizationUtility::translate('topicUpdated', 'pforum'));
             }
 
-            $this->redirect('show', 'Forum', 'Pforum', ['forum' => $topic->getForum()]);
+            return $this->redirect('show', 'Forum', 'Pforum', ['forum' => $topic->getForum()]);
         }
     }
 
@@ -212,11 +214,11 @@ class TopicController extends AbstractController
         $this->registerTopicFromRequest('topic');
     }
 
-    public function deleteAction(Topic $topic): void
+    public function deleteAction(Topic $topic)
     {
         $this->topicRepository->remove($topic);
         $this->addFlashMessage(LocalizationUtility::translate('topicDeleted', 'pforum'));
-        $this->redirect('list', 'Forum', 'Pforum');
+        return $this->redirect('list', 'Forum', 'Pforum');
     }
 
     /**
@@ -233,12 +235,12 @@ class TopicController extends AbstractController
     /**
      * We need this extra action, because hidden entries can't be found in FE mode.
      */
-    public function activateAction(Topic $topic): void
+    public function activateAction(Topic $topic)
     {
         $topic->setHidden(false);
         $this->topicRepository->update($topic);
         $this->addFlashMessage(LocalizationUtility::translate('topicActivated', 'pforum'));
-        $this->redirect('list', 'Forum', 'Pforum');
+        return $this->redirect('list', 'Forum', 'Pforum');
     }
 
     /**
@@ -262,7 +264,7 @@ class TopicController extends AbstractController
         }
     }
 
-    protected function addFeUserToTopic(Forum $forum, Topic $topic): void
+    protected function addFeUserToTopic(Forum $forum, Topic $topic): \Psr\Http\Message\ResponseInterface
     {
         if (is_array($GLOBALS['TSFE']->fe_user->user) && $GLOBALS['TSFE']->fe_user->user['uid']) {
             $user = $this->frontendUserRepository->findByUid(
@@ -274,9 +276,9 @@ class TopicController extends AbstractController
             $this->addFlashMessage(
                 'You must be logged in before creating a topic',
                 '',
-                AbstractMessage::WARNING
+                \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::WARNING
             );
-            $this->redirect('show', 'Forum', 'Pforum', ['forum' => $forum]);
+            return $this->redirect('show', 'Forum', 'Pforum', ['forum' => $forum]);
         }
     }
 

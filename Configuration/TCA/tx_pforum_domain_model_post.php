@@ -5,7 +5,6 @@ return [
         'label' => 'title',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
         'dividers2tabs' => true,
 
         'versioningWS' => 2,
@@ -22,9 +21,6 @@ return [
         ],
         'searchFields' => 'title,description,user,',
         'iconfile' => 'EXT:pforum/Resources/Public/Icons/tx_pforum_domain_model_post.svg',
-    ],
-    'interface' => [
-        'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, title, description, anonymous_user, frontend_user, images',
     ],
     'types' => [
         '1' => [
@@ -44,29 +40,16 @@ return [
         'sys_language_uid' => [
             'exclude' => true,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.language',
-            'config' => [
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'special' => 'languages',
-                'items' => [
-                    [
-                        'LLL:EXT:lang/locallang_general.xlf:LGL.allLanguages',
-                        -1,
-                        'flags-multiple'
-                    ],
-                ],
-                'default' => 0,
-            ]
+            'config' => ['type' => 'language']
         ],
         'l10n_parent' => [
             'displayCond' => 'FIELD:sys_language_uid:>:0',
-            'exclude' => true,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.l18n_parent',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'items' => [
-                    ['', 0],
+                    ['label' => '', 'value' => 0],
                 ],
                 'foreign_table' => 'tx_pforum_domain_model_post',
                 'foreign_table_where' => 'AND tx_pforum_domain_model_post.pid=###CURRENT_PID### AND tx_pforum_domain_model_post.sys_language_uid IN (-1,0)',
@@ -95,7 +78,7 @@ return [
                 'type' => 'check',
                 'items' => [
                     '1' => [
-                        '0' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:hidden.I.0'
+                        'label' => 'LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:hidden.I.0'
                     ]
                 ]
             ]
@@ -169,7 +152,7 @@ return [
                 'renderType' => 'selectSingle',
                 'foreign_table' => 'fe_users',
                 'items' => [
-                    ['', '']
+                    ['label' => '', 'value' => '']
                 ],
                 'minitems' => 0,
                 'maxitems' => 1,
@@ -178,12 +161,12 @@ return [
         'images' => [
             'exclude' => true,
             'label' => 'LLL:EXT:pforum/Resources/Private/Language/locallang_db.xlf:tx_pforum_domain_model_post.images',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
-                'images', [
-                    'minitems' => 0,
-                    'maxitems' => 5,
-                ]
-            ),
+            'config' => [
+                ### !!! Watch out for fieldName different from columnName
+                'type' => 'file',
+                'minitems' => 0,
+                'maxitems' => 5,
+            ],
         ],
         'topic' => [
             'config' => [
@@ -197,7 +180,7 @@ return [
                 'type' => 'check',
                 'items' => [
                     '1' => [
-                        '0' => 'benachrichtigt'
+                        'label' => 'benachrichtigt'
                     ]
                 ]
             ]

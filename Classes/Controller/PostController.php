@@ -29,12 +29,13 @@ class PostController extends AbstractController
     /**
      * @param Topic $topic
      * @param Post|null $post
-     * @Extbase\IgnoreValidation("post")
      */
-    public function newAction(Topic $topic, Post $post = null): void
+    #[Extbase\IgnoreValidation(['argumentName' => 'post'])]
+    public function newAction(Topic $topic, Post $post = null): \Psr\Http\Message\ResponseInterface
     {
         $this->view->assign('topic', $topic);
         $this->view->assign('post', $post);
+        return $this->htmlResponse();
     }
 
     /**
@@ -45,7 +46,7 @@ class PostController extends AbstractController
         $this->preProcessControllerAction();
     }
 
-    public function createAction(Topic $topic, Post $post): void
+    public function createAction(Topic $topic, Post $post)
     {
         // if auth = frontend user
         if ((int)$this->settings['auth'] === 2) {
@@ -58,8 +59,7 @@ class PostController extends AbstractController
         // if a preview was requested direct to preview action
         if ($this->controllerContext->getRequest()->hasArgument('preview')) {
             $post->setHidden(true); // post should not be visible while previewing
-            $this->persistenceManager->persistAll(); // we need an uid before redirecting
-            $this->redirect(
+            $this->persistenceManager->persistAll(); return $this->redirect(
                 'edit',
                 'Post',
                 'Pforum',
@@ -91,7 +91,7 @@ class PostController extends AbstractController
         }
 
         $this->addFlashMessageForCreation();
-        $this->redirect('show', 'Topic', 'Pforum', ['topic' => $topic]);
+        return $this->redirect('show', 'Topic', 'Pforum', ['topic' => $topic]);
     }
 
     /**
@@ -110,13 +110,14 @@ class PostController extends AbstractController
      * @param bool $isPreview
      * @param bool $isNew We need the information if updateAction was called from createAction.
      *                    If so we have to passthrough this information
-     * @Extbase\IgnoreValidation("post")
      */
-    public function editAction(Post $post = null, bool $isPreview = false, bool $isNew = false): void
+    #[Extbase\IgnoreValidation(['argumentName' => 'post'])]
+    public function editAction(Post $post = null, bool $isPreview = false, bool $isNew = false): \Psr\Http\Message\ResponseInterface
     {
         $this->view->assign('post', $post);
         $this->view->assign('isPreview', $isPreview);
         $this->view->assign('isNew', $isNew);
+        return $this->htmlResponse();
     }
 
     /**
@@ -135,14 +136,14 @@ class PostController extends AbstractController
      * @param bool $isNew We need the information if updateAction was
      *                    called from createAction. If so we have to add different messages
      */
-    public function updateAction(Post $post, bool $isNew = false): void
+    public function updateAction(Post $post, bool $isNew = false)
     {
         $this->postRepository->update($post);
 
         // if a preview was requested direct to preview action
         if ($this->controllerContext->getRequest()->hasArgument('preview')) {
             $post->setHidden(true);
-            $this->redirect(
+            return $this->redirect(
                 'edit',
                 'Post',
                 'Pforum',
@@ -170,7 +171,7 @@ class PostController extends AbstractController
                 $this->addFlashMessage(LocalizationUtility::translate('postUpdated', 'pforum'));
             }
 
-            $this->redirect('show', 'Topic', 'Pforum', ['topic' => $post->getTopic()]);
+            return $this->redirect('show', 'Topic', 'Pforum', ['topic' => $post->getTopic()]);
         }
     }
 
@@ -188,11 +189,11 @@ class PostController extends AbstractController
     /**
      * @param Post $post
      */
-    public function deleteAction(Post $post): void
+    public function deleteAction(Post $post)
     {
         $this->postRepository->remove($post);
         $this->addFlashMessage(LocalizationUtility::translate('postDeleted', 'pforum'));
-        $this->redirect('list', 'Forum', 'Pforum');
+        return $this->redirect('list', 'Forum', 'Pforum');
     }
 
     protected function mailToTopicCreator(Topic $topic, Post $post): void
@@ -227,7 +228,7 @@ class PostController extends AbstractController
      *
      * @param Post $post
      */
-    public function activateAction(Post $post): void
+    public function activateAction(Post $post)
     {
         $post->setHidden(false);
         $this->postRepository->update($post);
@@ -236,7 +237,7 @@ class PostController extends AbstractController
         $this->mailToTopicCreator($post->getTopic(), $post);
 
         $this->addFlashMessage(LocalizationUtility::translate('postActivated', 'pforum'));
-        $this->redirect('list', 'Forum', 'Pforum');
+        return $this->redirect('list', 'Forum', 'Pforum');
     }
 
     /**
@@ -258,7 +259,7 @@ class PostController extends AbstractController
         }
     }
 
-    protected function addFeUserToPost(Topic $topic, Post $post): void
+    protected function addFeUserToPost(Topic $topic, Post $post): \Psr\Http\Message\ResponseInterface
     {
         if (is_array($GLOBALS['TSFE']->fe_user->user) && $GLOBALS['TSFE']->fe_user->user['uid']) {
             $user = $this->frontendUserRepository->findByUid(
@@ -268,7 +269,7 @@ class PostController extends AbstractController
         } else {
             /* normally this should never be called, because the link to create a new entry was not displayed if user was not authenticated */
             $this->addFlashMessage('You must be logged in before creating a post');
-            $this->redirect('show', 'Forum', 'Pforum', ['forum' => $topic->getForum()]);
+            return $this->redirect('show', 'Forum', 'Pforum', ['forum' => $topic->getForum()]);
         }
     }
 

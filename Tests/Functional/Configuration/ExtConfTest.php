@@ -50,7 +50,7 @@ class ExtConfTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function getEmailFromAddressInitiallyThrowsException()
+    public function getEmailFromAddressInitiallyThrowsException(): void
     {
         self::expectExceptionCode(1604694223);
         $this->subject->getEmailFromAddress();
@@ -59,7 +59,7 @@ class ExtConfTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function getEmailFromAddressInitiallyReturnsEmailFromInstallTool()
+    public function getEmailFromAddressInitiallyReturnsEmailFromInstallTool(): void
     {
         $email = 'info@example.com';
         $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromAddress'] = $email;
@@ -72,7 +72,7 @@ class ExtConfTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function setEmailFromAddressSetsEmailAddress()
+    public function setEmailFromAddressSetsEmailAddress(): void
     {
         $email = 'abc@example.com';
         $this->subject->setEmailFromAddress($email);
@@ -86,7 +86,7 @@ class ExtConfTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function getEmailFromNameInitiallyThrowsException()
+    public function getEmailFromNameInitiallyThrowsException(): void
     {
         self::expectExceptionCode(1604694279);
         $this->subject->getEmailFromName();
@@ -95,7 +95,7 @@ class ExtConfTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function getEmailFromNameInitiallyReturnsEmailNameFromInstallTool()
+    public function getEmailFromNameInitiallyReturnsEmailNameFromInstallTool(): void
     {
         $name = 'stefan';
         $GLOBALS['TYPO3_CONF_VARS']['MAIL']['defaultMailFromName'] = $name;
@@ -108,7 +108,7 @@ class ExtConfTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function setEmailFromNameSetsEmailName()
+    public function setEmailFromNameSetsEmailName(): void
     {
         $name = 'stefan';
         $this->subject->setEmailFromName($name);

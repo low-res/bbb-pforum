@@ -43,8 +43,8 @@ class Post extends AbstractEntity
 
     /**
      * @var string
-     * @Extbase\Validate("NotEmpty")
      */
+    #[Extbase\Validate(['validator' => 'NotEmpty'])]
     protected $description = '';
 
     /**

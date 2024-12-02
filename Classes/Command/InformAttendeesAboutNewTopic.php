@@ -51,6 +51,13 @@ class InformAttendeesAboutNewTopic extends Command
      * @var SiteFinder
      */
     protected $sitefinder = null;
+    public function __construct(\Webyte\BbbEvents\Domain\Repository\AttendeeRepository $attendeeRepository, \Webyte\BbbEvents\Domain\Repository\EventRepository $eventRepository, \JWeiland\Pforum\Domain\Repository\TopicRepository $topicRepository, \TYPO3\CMS\Core\Site\SiteFinder $sitefinder)
+    {
+        $this->attendeeRepository = $attendeeRepository;
+        $this->eventRepository = $eventRepository;
+        $this->topicRepository = $topicRepository;
+        $this->sitefinder = $sitefinder;
+    }
 
 
     /**
@@ -98,7 +105,7 @@ class InformAttendeesAboutNewTopic extends Command
         return 0;
     }
 
-    private function changeTopicAttendeesInformedFlag(Topic $topic, int $newStatus = 1)
+    private function changeTopicAttendeesInformedFlag(Topic $topic, int $newStatus = 1): void
     {
         $topic->setAttendeesInformed($newStatus);
         $this->topicRepository->update($topic);
@@ -107,43 +114,9 @@ class InformAttendeesAboutNewTopic extends Command
 
 
     /**
-     * @param  AttendeeRepository  $attendeeRepository
-     */
-    public function injectAttendeeRepository(AttendeeRepository $attendeeRepository)
-    {
-        $this->attendeeRepository = $attendeeRepository;
-    }
-
-    /**
-     * @param  EventRepository  $eventRepository
-     */
-    public function injectEventRepository(EventRepository $eventRepository)
-    {
-        $this->eventRepository = $eventRepository;
-    }
-
-    /**
-     * @param  TopicRepository  $topicRepository
-     */
-    public function injectTopicRepository(TopicRepository $topicRepository)
-    {
-        $this->topicRepository = $topicRepository;
-    }
-
-
-    /**
-     * @param  SiteFinder  $sitefinder
-     */
-    public function injectSiteFinder(SiteFinder $sitefinder)
-    {
-        $this->sitefinder = $sitefinder;
-    }
-
-
-    /**
      * @param  Attendee  $attendee
      */
-    private function sendTopicInfo(Topic $topic, Attendee $attendee)
+    private function sendTopicInfo(Topic $topic, Attendee $attendee): void
     {
 
         // Create the message

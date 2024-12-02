@@ -24,19 +24,20 @@ class ForumController extends AbstractController
      */
     protected $frontendGroupHelper;
 
-    public function injectFrontendGroupHelper(FrontendGroupHelper $frontendGroupHelper): void
+    public function __construct(\JWeiland\Pforum\Helper\FrontendGroupHelper $frontendGroupHelper)
     {
         $this->frontendGroupHelper = $frontendGroupHelper;
     }
 
-    public function listAction(): void
+    public function listAction(): \Psr\Http\Message\ResponseInterface
     {
         $this->postProcessAndAssignFluidVariables([
             'forums' => $this->forumRepository->findAll()
         ]);
+        return $this->htmlResponse();
     }
 
-    public function showAction(Forum $forum): void
+    public function showAction(Forum $forum): \Psr\Http\Message\ResponseInterface
     {
         $topics = $this->topicRepository->findByForum($forum);
         if ($this->frontendGroupHelper->uidExistsInGroupData((int)($this->settings['uidOfAdminGroup'] ?? 0))) {
@@ -50,5 +51,6 @@ class ForumController extends AbstractController
             'forum' => $forum,
             'topics' => $topics,
         ]);
+        return $this->htmlResponse();
     }
 }
