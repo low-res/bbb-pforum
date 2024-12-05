@@ -76,7 +76,7 @@ class InformAttendeesAboutNewTopic extends Command
     }
 
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $topics = $this->topicRepository->findUnsendTopics();
 

@@ -20,10 +20,12 @@ use JWeiland\Pforum\Domain\Repository\PostRepository;
 use JWeiland\Pforum\Domain\Repository\TopicRepository;
 use JWeiland\Pforum\Event\PostProcessFluidVariablesEvent;
 use JWeiland\Pforum\Event\PreProcessControllerActionEvent;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\Session;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+
 
 /**
  * Abstract class with useful methods for all other extending classes
@@ -69,8 +71,17 @@ class AbstractController extends ActionController
      * @var PersistenceManager
      */
     protected $persistenceManager;
-    public function __construct(\JWeiland\Pforum\Configuration\ExtConf $extConf, \TYPO3\CMS\Extbase\Persistence\Generic\Session $session, \JWeiland\Pforum\Domain\Repository\ForumRepository $forumRepository, \JWeiland\Pforum\Domain\Repository\TopicRepository $topicRepository, \JWeiland\Pforum\Domain\Repository\PostRepository $postRepository, \JWeiland\Pforum\Domain\Repository\AnonymousUserRepository $anonymousUserRepository, \JWeiland\Pforum\Domain\Repository\FrontendUserRepository $frontendUserRepository, \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager $persistenceManager, protected \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager)
-    {
+
+    public function __construct(
+        \JWeiland\Pforum\Configuration\ExtConf $extConf,
+        \TYPO3\CMS\Extbase\Persistence\Generic\Session $session,
+        \JWeiland\Pforum\Domain\Repository\ForumRepository $forumRepository,
+        \JWeiland\Pforum\Domain\Repository\TopicRepository $topicRepository,
+        \JWeiland\Pforum\Domain\Repository\PostRepository $postRepository,
+        \JWeiland\Pforum\Domain\Repository\AnonymousUserRepository $anonymousUserRepository,
+        \JWeiland\Pforum\Domain\Repository\FrontendUserRepository $frontendUserRepository,
+        \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager $persistenceManager
+    ) {
         $this->extConf = $extConf;
         $this->session = $session;
         $this->forumRepository = $forumRepository;
@@ -83,6 +94,12 @@ class AbstractController extends ActionController
 
     public function initializeAction(): void
     {
+        if(!$this->forumRepository) $this->forumRepository = GeneralUtility::makeInstance(ForumRepository::class);
+        if(!$this->topicRepository) $this->topicRepository = GeneralUtility::makeInstance(TopicRepository::class);
+        if(!$this->postRepository) $this->postRepository = GeneralUtility::makeInstance(PostRepository::class);
+        if(!$this->frontendUserRepository) $this->frontendUserRepository = GeneralUtility::makeInstance(FrontendUserRepository::class);
+
+
         // if this value was not set, then it will be filled with 0
         // but that is not good, because UriBuilder accepts 0 as pid, so it's better to set it to NULL
         if (empty($this->settings['pidOfDetailPage'])) {
@@ -102,7 +119,7 @@ class AbstractController extends ActionController
             empty($this->settings['emailIsMandatory'])
         ) {
             throw new \RuntimeException(
-                'You can\'t hide topics at creation, deactivate admin activation and mark email as NOT mandatory.' .
+                'You can\'t hide topics at creation, deactivate admin activation and mark email as NOT mandatory.'.
                 'This would produce hidden records which will never be visible',
                 1378371532
             );
@@ -113,7 +130,7 @@ class AbstractController extends ActionController
             empty($this->settings['emailIsMandatory'])
         ) {
             throw new \RuntimeException(
-                'You can\'t hide posts at creation, deactivate admin activation and mark email ' .
+                'You can\'t hide posts at creation, deactivate admin activation and mark email '.
                 'as NOT mandatory. This would produce hidden records which will never be visible',
                 1378371541
             );
@@ -126,9 +143,9 @@ class AbstractController extends ActionController
      */
     protected function deleteUploadedFilesOnValidationErrors(string $argument): void
     {
-        if ($this->getControllerContext()->getRequest()->hasArgument($argument)) {
+        if ( $this->request->hasArgument($argument) ) {
             /** @var Topic $topic */
-            $topic = $this->getControllerContext()->getRequest()->getArgument($argument);
+            $topic = $this->request->getRequest()->getArgument($argument);
             $images = $topic->getImages();
             foreach ($images as $image) {
                 $image->getOriginalResource()->getOriginalFile()->delete();

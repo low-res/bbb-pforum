@@ -41,13 +41,13 @@ class TopicController extends AbstractController
 
     public function showAction(Topic $topic): \Psr\Http\Message\ResponseInterface
     {
-        $posts = $this->postRepository->findByTopic($topic);
+        $posts = $this->postRepository?->findByTopic($topic);
 
         $context = GeneralUtility::makeInstance(Context::class);
         /** @var UserAspect $aspect */
         $feuser = $context->getAspect('frontend.user');
         $currentFeUserId = $feuser->get('id');
-        $isOwnTopic = $currentFeUserId == $topic->getFrontendUser()->getUid();
+        $isOwnTopic = $currentFeUserId == $topic->getFrontendUser()?->getUid();
         
         if ($this->frontendGroupHelper->uidExistsInGroupData((int)($this->settings['uidOfAdminGroup'] ?? 0))) {
             $posts->getQuery()
@@ -91,10 +91,10 @@ class TopicController extends AbstractController
         }
 
         $forum->addTopic($topic);
-        $this->forumRepository->update($forum);
+        $this->forumRepository?->update($forum);
 
         // if a preview was requested direct to preview action
-        if ($this->controllerContext->getRequest()->hasArgument('preview')) {
+        if ($this->request->hasArgument('preview')) {
             $topic->setHidden(true); // topic should not be visible while previewing
             $this->persistenceManager->persistAll(); return $this->redirect(
                 'edit',
@@ -169,7 +169,7 @@ class TopicController extends AbstractController
         $this->topicRepository->update($topic);
 
         // if a preview was requested direct to preview action
-        if ($this->controllerContext->getRequest()->hasArgument('preview')) {
+        if ($this->request->hasArgument('preview')) {
             $topic->setHidden(true);
             return $this->redirect(
                 'edit',
@@ -264,13 +264,14 @@ class TopicController extends AbstractController
         }
     }
 
-    protected function addFeUserToTopic(Forum $forum, Topic $topic): \Psr\Http\Message\ResponseInterface
+    protected function addFeUserToTopic(Forum $forum, Topic $topic): \Psr\Http\Message\ResponseInterface|null
     {
         if (is_array($GLOBALS['TSFE']->fe_user->user) && $GLOBALS['TSFE']->fe_user->user['uid']) {
-            $user = $this->frontendUserRepository->findByUid(
+            $user = $this->frontendUserRepository?->findByUid(
                 (int)$GLOBALS['TSFE']->fe_user->user['uid']
             );
-            $topic->setFrontendUser($user);
+            if( $user ) $topic->setFrontendUser( $user );
+            return null;
         } else {
             /* normally this should never be called, because the link to create a new entry was not displayed if user was not authenticated */
             $this->addFlashMessage(

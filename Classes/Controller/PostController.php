@@ -57,7 +57,7 @@ class PostController extends AbstractController
         $this->topicRepository->update($topic);
 
         // if a preview was requested direct to preview action
-        if ($this->controllerContext->getRequest()->hasArgument('preview')) {
+        if ($this->request->hasArgument('preview')) {
             $post->setHidden(true); // post should not be visible while previewing
             $this->persistenceManager->persistAll(); return $this->redirect(
                 'edit',
@@ -141,7 +141,7 @@ class PostController extends AbstractController
         $this->postRepository->update($post);
 
         // if a preview was requested direct to preview action
-        if ($this->controllerContext->getRequest()->hasArgument('preview')) {
+        if ($this->request->hasArgument('preview')) {
             $post->setHidden(true);
             return $this->redirect(
                 'edit',
@@ -259,13 +259,14 @@ class PostController extends AbstractController
         }
     }
 
-    protected function addFeUserToPost(Topic $topic, Post $post): \Psr\Http\Message\ResponseInterface
+    protected function addFeUserToPost(Topic $topic, Post $post): \Psr\Http\Message\ResponseInterface|null
     {
         if (is_array($GLOBALS['TSFE']->fe_user->user) && $GLOBALS['TSFE']->fe_user->user['uid']) {
             $user = $this->frontendUserRepository->findByUid(
                 (int)$GLOBALS['TSFE']->fe_user->user['uid']
             );
             $post->setFrontendUser($user);
+            return null;
         } else {
             /* normally this should never be called, because the link to create a new entry was not displayed if user was not authenticated */
             $this->addFlashMessage('You must be logged in before creating a post');

@@ -15,13 +15,17 @@ use JWeiland\Pforum\Domain\Model\Post;
 use JWeiland\Pforum\Domain\Model\Topic;
 use JWeiland\Pforum\Domain\Repository\PostRepository;
 use JWeiland\Pforum\Domain\Repository\TopicRepository;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
+use \TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 
 /**
  * Main controller to list and show postings/questions
@@ -38,25 +42,29 @@ class AdministrationController extends ActionController
      */
     protected $postRepository;
 
-    public function __construct(TopicRepository $topicRepository, PostRepository $postRepository, private \TYPO3\CMS\Backend\Template\ModuleTemplateFactory $moduleTemplateFactory)
+    protected ModuleTemplateFactory $moduleTemplateFactory;
+
+    protected IconFactory $iconFactory;
+
+    public function __construct(TopicRepository $topicRepository, PostRepository $postRepository, ModuleTemplateFactory $moduleTemplateFactory, IconFactory $iconFactory)
     {
         $this->topicRepository = $topicRepository;
         $this->postRepository = $postRepository;
+        $this->moduleTemplateFactory = $moduleTemplateFactory;
+        $this->iconFactory = $iconFactory;
     }
 
     /**
      * Set up the doc header properly here
-     * @param \TYPO3\CMS\Extbase\Mvc\View\ViewInterface $view
      */
-    protected function initializeView($view): void
+    protected function initializeAction(): void
     {
-        if ($view instanceof BackendTemplateView) {
-            parent::initializeView($view);
-            //$view->getModuleTemplate()->getDocHeaderComponent()->setMetaInformation([]);
-
-            $this->createDocheaderActionButtons();
-            $this->createShortcutButton();
-        }
+//        if ($view instanceof BackendTemplateView) {
+        //$view->getModuleTemplate()->getDocHeaderComponent()->setMetaInformation([]);
+        $this->createDocheaderActionButtons();
+        $this->createShortcutButton();
+        parent::initializeAction();
+//        }
     }
 
     protected function createDocheaderActionButtons(): void
@@ -67,13 +75,14 @@ class AdministrationController extends ActionController
         }
 
         $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
-        $uriBuilder = $this->controllerContext->getUriBuilder();
+        /** @var UriBuilder $uriBuilder */
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
 
-        $button = $buttonBar->makeLinkButton()
-            ->setHref($uriBuilder->reset()->uriFor('index', [], 'Administration'))
-            ->setTitle('Back')
-            ->setIcon($moduleTemplate->getIconFactory()->getIcon('actions-view-go-back', Icon::SIZE_SMALL));
-        $buttonBar->addButton($button, ButtonBar::BUTTON_POSITION_LEFT);
+//        $button = $buttonBar->makeLinkButton()
+//            ->setHref( $uriBuilder->buildUriFromRoute )
+//            ->setTitle('Back')
+//            ->setIcon( $this->iconFactory->getIcon( 'actions-view-go-back', Icon::SIZE_SMALL ) );
+//        $buttonBar->addButton($button, ButtonBar::BUTTON_POSITION_LEFT);
     }
 
     protected function createShortcutButton(): void
@@ -81,19 +90,20 @@ class AdministrationController extends ActionController
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
-        // Shortcut
-        $shortcutButton = $buttonBar->makeShortcutButton()
-            ->setModuleName('web_PforumAdministration')
-            ->setGetVariables(['route', 'module', 'id'])
-            ->setDisplayName('Shortcut');
-        $buttonBar->addButton($shortcutButton, ButtonBar::BUTTON_POSITION_RIGHT);
+        $pageId = (int)($this->request->getQueryParams()['id'] ?? 0);
+//        $shortCutButton = $buttonBar->makeShortcutButton()
+//            ->setRouteIdentifier('web_PforumAdministration')
+//            ->setDisplayName('Shortcut')
+//            ->setArguments(['route', 'module', 'id']);
+//        $buttonBar->addButton($shortCutButton, ButtonBar::BUTTON_POSITION_RIGHT);
+
     }
 
     public function indexAction(): \Psr\Http\Message\ResponseInterface
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $moduleTemplate->setContent($this->view->render());
-        return $this->htmlResponse($moduleTemplate->renderContent());
+        return $moduleTemplate->renderResponse(); //$this->htmlResponse( $moduleTemplate->renderContent() );
     }
 
     public function listHiddenTopicsAction(): \Psr\Http\Message\ResponseInterface
@@ -101,7 +111,7 @@ class AdministrationController extends ActionController
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $this->view->assign('topics', $this->topicRepository->findAllHidden()->toArray());
         $moduleTemplate->setContent($this->view->render());
-        return $this->htmlResponse($moduleTemplate->renderContent());
+        return $moduleTemplate->renderResponse(); //$this->htmlResponse($moduleTemplate->renderContent());
     }
 
     public function listHiddenPostsAction(): \Psr\Http\Message\ResponseInterface
@@ -109,7 +119,7 @@ class AdministrationController extends ActionController
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $this->view->assign('posts', $this->postRepository->findAllHidden()->toArray());
         $moduleTemplate->setContent($this->view->render());
-        return $this->htmlResponse($moduleTemplate->renderContent());
+        return $moduleTemplate->renderResponse(); //$this->htmlResponse($moduleTemplate->renderContent());
     }
 
     /**

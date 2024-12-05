@@ -80,7 +80,7 @@ class InformAttendeesAboutNewPosts extends Command
     }
 
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $posts = $this->postRepository->findUnsendPosts();
 

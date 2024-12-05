@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace JWeiland\Pforum\Controller;
 
 use JWeiland\Pforum\Domain\Model\Forum;
+use JWeiland\Pforum\Domain\Repository\ForumRepository;
 use JWeiland\Pforum\Helper\FrontendGroupHelper;
 
 /**
@@ -24,10 +25,12 @@ class ForumController extends AbstractController
      */
     protected $frontendGroupHelper;
 
-    public function __construct(\JWeiland\Pforum\Helper\FrontendGroupHelper $frontendGroupHelper)
-    {
-        $this->frontendGroupHelper = $frontendGroupHelper;
-    }
+//    public function __construct(\JWeiland\Pforum\Helper\FrontendGroupHelper $frontendGroupHelper)
+//    {
+//        $this->frontendGroupHelper = $frontendGroupHelper;
+//        parent::__construct();
+//
+//    }
 
     public function listAction(): \Psr\Http\Message\ResponseInterface
     {
@@ -40,7 +43,7 @@ class ForumController extends AbstractController
     public function showAction(Forum $forum): \Psr\Http\Message\ResponseInterface
     {
         $topics = $this->topicRepository->findByForum($forum);
-        if ($this->frontendGroupHelper->uidExistsInGroupData((int)($this->settings['uidOfAdminGroup'] ?? 0))) {
+        if ($this->frontendGroupHelper?->uidExistsInGroupData( (int)($this->settings['uidOfAdminGroup'] ?? 0)) ) {
             $topics->getQuery()
                 ->getQuerySettings()
                 ->setIgnoreEnableFields(true)
