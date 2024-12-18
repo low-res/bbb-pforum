@@ -61,6 +61,7 @@ class InformAttendeesAboutNewPosts extends Command
         $this->eventRepository = $eventRepository;
         $this->postRepository = $postRepository;
         $this->sitefinder = $sitefinder;
+        parent::__construct();
     }
 
 

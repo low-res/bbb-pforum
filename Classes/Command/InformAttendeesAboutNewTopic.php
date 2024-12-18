@@ -57,6 +57,7 @@ class InformAttendeesAboutNewTopic extends Command
         $this->eventRepository = $eventRepository;
         $this->topicRepository = $topicRepository;
         $this->sitefinder = $sitefinder;
+        parent::__construct();
     }
 
 
