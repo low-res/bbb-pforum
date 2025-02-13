@@ -18,6 +18,7 @@ use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 use Webyte\BbbEvents\Domain\Model\Attendee;
 use Webyte\BbbEvents\Domain\Repository\AttendeeRepository;
 use Webyte\BbbEvents\Domain\Repository\EventRepository;
@@ -40,7 +41,6 @@ class InformAttendeesAboutNewPosts extends Command
      * @var EventRepository
      */
     protected $eventRepository = null;
-
 
 
     /**
@@ -110,6 +110,7 @@ class InformAttendeesAboutNewPosts extends Command
         return 0;
     }
 
+
     private function changePostAttendeesInformedFlag(Post $post, int $newStatus = 1): void
     {
         $post->setAttendeesInformed($newStatus);
@@ -123,16 +124,16 @@ class InformAttendeesAboutNewPosts extends Command
      */
     private function sendPostInfo(Post $post, Attendee $attendee): void
     {
-
+        $paths = GeneralUtility::makeInstance(TemplatePaths::class, $GLOBALS['TYPO3_CONF_VARS']['MAIL']);
         // Create the message
         /** @var FluidEmail $mail */
-        $mail = GeneralUtility::makeInstance(FluidEmail::class);
+        $mail = GeneralUtility::makeInstance(FluidEmail::class, $paths);
 
         $templateName = 'ForumNewTopicInfo';
 
         $event = $attendee->getContingent()->getComitee()->getEvent();
         $topicTitle = $post->getTopic()?->getTitle();
-        $email = $post->getFrontendUser()->getEmail();
+        $email = $post->getFrontendUser()?->getEmail()??'';
         $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
         $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
         $deeplink = $this->createLinkToPage($event->getRootpageuid());
