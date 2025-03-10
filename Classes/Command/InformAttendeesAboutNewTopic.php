@@ -18,7 +18,7 @@ use Webyte\BbbEvents\Domain\Model\Attendee;
 use Webyte\BbbEvents\Domain\Repository\AttendeeRepository;
 use Webyte\BbbEvents\Domain\Repository\EventRepository;
 use Webyte\BbbEvents\Domain\Service\AttendeeService;
-
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class InformAttendeesAboutNewTopic extends Command
 {
@@ -127,7 +127,7 @@ class InformAttendeesAboutNewTopic extends Command
         $templateName = 'ForumNewTopicInfo';
 
         $event = $attendee->getContingent()->getComitee()->getEvent();
-        $email = $topic->getFrontendUser()->getEmail();
+        $email = $topic->getFrontendUser()?->getEmail()??'';
         $creatorAttendee = $this->attendeeRepository->getExistingAttendeeInSameEventByMail($email, $event);
         $creatorName = $creatorAttendee ? $creatorAttendee->getFullName() : $email;
         $deeplink = $this->createLinkToPage($event->getRootpageuid());

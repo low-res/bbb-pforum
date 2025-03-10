@@ -18,12 +18,11 @@ use TYPO3\CMS\Core\Mail\Mailer;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Fluid\View\TemplatePaths;
 use Webyte\BbbEvents\Domain\Model\Attendee;
 use Webyte\BbbEvents\Domain\Repository\AttendeeRepository;
 use Webyte\BbbEvents\Domain\Repository\EventRepository;
 use Webyte\BbbEvents\Domain\Service\AttendeeService;
-
+use TYPO3\CMS\Fluid\View\TemplatePaths;
 
 class InformAttendeesAboutNewPosts extends Command
 {
