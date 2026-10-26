@@ -34,8 +34,27 @@ class TopicController extends AbstractController
      */
     protected $frontendGroupHelper;
 
-    public function __construct(\JWeiland\Pforum\Helper\FrontendGroupHelper $frontendGroupHelper)
-    {
+    public function __construct(
+        \JWeiland\Pforum\Configuration\ExtConf $extConf,
+        \TYPO3\CMS\Extbase\Persistence\Generic\Session $session,
+        \JWeiland\Pforum\Domain\Repository\ForumRepository $forumRepository,
+        \JWeiland\Pforum\Domain\Repository\TopicRepository $topicRepository,
+        \JWeiland\Pforum\Domain\Repository\PostRepository $postRepository,
+        \JWeiland\Pforum\Domain\Repository\AnonymousUserRepository $anonymousUserRepository,
+        \JWeiland\Pforum\Domain\Repository\FrontendUserRepository $frontendUserRepository,
+        \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager $persistenceManager,
+        \JWeiland\Pforum\Helper\FrontendGroupHelper $frontendGroupHelper
+    ) {
+        parent::__construct(
+            $extConf,
+            $session,
+            $forumRepository,
+            $topicRepository,
+            $postRepository,
+            $anonymousUserRepository,
+            $frontendUserRepository,
+            $persistenceManager
+        );
         $this->frontendGroupHelper = $frontendGroupHelper;
     }
 
@@ -260,7 +279,7 @@ class TopicController extends AbstractController
         }
 
         if ($topic instanceof Topic) {
-            $this->session->registerObject($topic, $topic->getUid());
+            $this->session->registerObject($topic, (string)$topic->getUid());
         }
     }
 
