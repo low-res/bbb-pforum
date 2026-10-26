@@ -34,8 +34,16 @@ class ForumController extends AbstractController
 
     public function listAction(): \Psr\Http\Message\ResponseInterface
     {
+        $forums = $this->forumRepository->findAll()->toArray();
+
+        // Gibt es nur ein einziges Forum, ist die Übersicht ein überflüssiger
+        // Zwischenschritt - stattdessen direkt zu dessen Themenliste weiterleiten.
+        if (count($forums) === 1) {
+            return $this->redirect('show', 'Forum', null, ['forum' => reset($forums)], $this->settings['pidOfDetailPage']);
+        }
+
         $this->postProcessAndAssignFluidVariables([
-            'forums' => $this->forumRepository->findAll()
+            'forums' => $forums,
         ]);
         return $this->htmlResponse();
     }
